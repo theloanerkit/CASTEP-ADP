@@ -1,0 +1,10 @@
+*.tar.gz
+*.bib
+*.castep
+*.cell
+*.md
+*.param
+*.zip
+plot.py
+*.spt
+*.txt
