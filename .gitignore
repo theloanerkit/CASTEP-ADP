@@ -11,3 +11,5 @@ plot.py
 !README.md
 *.adp
 /__pycache__
+!example.adp
+*.dat

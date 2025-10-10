@@ -1,7 +1,11 @@
 # CASTEP-ADP tool
-
+```.adp``` input file should have filename ```<seed>.adp```
 
 ## input file parameters
+```calculate_adp```: calculate the atomic displacement paramters, default value = True (cannot be false if ```write_jmol``` is set to True)
+
+```calculate_ke```: calculate the kinetic energy tensor from averaged velocities from a .md file, default value = False (written out in electron volts)
+
 ```equilibration_timesteps```: number of equilibration timesteps for the MD calculation, default value = 0
 
 ```r_equilibrium```: specifies the method used to calculate $r_{eq}$ for calculating $U$, default value = finite 

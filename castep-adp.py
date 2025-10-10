@@ -1,13 +1,11 @@
 import argparse
 import os
 import pint
-from copy import deepcopy as cp
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as sc
-import time
 import subprocess
-import struct
+
+import time
 
 ureg = pint.UnitRegistry()
 
@@ -23,7 +21,36 @@ jmol_colours = {"H":  "FFFFFF",
                 "N":  "3050F8",
                 "O":  "FF0D0D",
                 "F":  "90E050",
-                "Ne": "B3E3F5"}
+                "Ne": "B3E3F5",
+                "Mo": "54B5B5"}
+
+masses = {"H":  1.00794,
+          "He": 4.0026,
+          "Li": 6.941,
+          "Be": 9.012187,
+          "B":  10.811,
+          "C":  12.0107,
+          "N":  14.00674,
+          "O":  15.9994,
+          "F":  18.9984,
+          "Ne": 20.1797,
+          "Na": 22.98977,
+          "Mg": 24.305,
+          "Al": 26.98154,
+          "Si": 28.0855,
+          "P":  30.97376,
+          "S":  32.066,
+          "Cl": 35.4527,
+          "Ar": 39.948,
+          "K":  39.0983,
+          "Ca": 40.078,
+          "Mo": 95.94}
+
+mkeys = masses.keys()
+for k in mkeys:
+    masses[k] = (masses[k]*ureg.a_u_mass)
+
+#masses *= ureg.a_u_mass
 
 class md_run:
     def __init__(self,timesteps,atoms,positions,velocities):
@@ -52,7 +79,11 @@ class adp_settings:
         self.seed = seed
         self.settings = {"equilibration_timesteps":0,
                          "write_jmol":False,
-                         "r_equilibrium":"finite"} # finite, zero, time
+                         "r_equilibrium":"finite", # finite, zero, time
+                         "calculate_adp":True,
+                         "jmol_scale":5,
+                         "calculate_ke":False
+                         } 
         self.valid = True
         self.parse()
         self.check()
@@ -88,9 +119,9 @@ class adp_settings:
             print(f"equilibration_timesteps must be non-negative, got {self.settings["equilibration_timesteps"]}")
 
         # checking write_jmol
-        if self.valid and self.settings["write_jmol"] in ["t","true"]:
+        if self.valid and self.settings["write_jmol"] in ["t","true",True]:
             self.settings["write_jmol"] = True
-        elif self.valid and self.settings["write_jmol"] in ["f","false"]:
+        elif self.valid and self.settings["write_jmol"] in ["f","false",False]:
             self.settings["write_jmol"] = False
         else:
             self.valid = False
@@ -101,11 +132,29 @@ class adp_settings:
             self.valid = False
             print(f"unexpected value {self.settings["r_equilibrium"]} for r_equilibrium, expected one of finite/zero/time")
 
-#def loading_bar(percent,msg):
-#    string = f"{msg} [{"#"*percent}{" "*(50-percent)}]"
-#    print(string,end="\r")
+        # checking calculate_adp
+        if self.valid and self.settings["calculate_adp"] in ["t","true",True]:
+            self.settings["calculate_adp"] = True
+        elif self.valid and self.settings["calculate_adp"] in ["f","false",False]:
+            self.settings["calcuate_adp"] = False
+        else:
+            self.valid = False
+            print(f"unexpected value {self.settings["calculate_adp"]} for calculate_adp, expected true or false")
+        if self.valid and self.settings["write_jmol"] and not self.settings["calculate_adp"]:
+            self.valid = False
+            print(f"calculate_adp cannot be set to false if write_jmol is true")
 
-def parse_md(fname):
+        # checking calculate_ke
+        if self.valid and self.settings["calculate_ke"] in ["t","true",True]:
+            self.settings["calculate_ke"] = True
+        elif self.valid and self.settings["calculate_ke"] in ["f","false",False]:
+            self.settings["calculate_ke"] = False
+        else:
+            self.valid = False
+            print(f"unexpected value {self.settings["calculate_ke"]} for calculate_ke, expected true or false")
+
+
+def parse_md(fname,eq_timesteps):
     """parses a CASTEP .md file, returning a md_run object with data
 
     Args:
@@ -130,9 +179,11 @@ def parse_md(fname):
     # get positions
     process_pos = subprocess.Popen(["grep","<-- R",f"{fname}.md"],stdout=subprocess.PIPE)
     all_positions = np.fromiter(map(float,subprocess.check_output(["awk","{print $3,$4,$5}"],stdin=process_pos.stdout).decode("utf-8").split()),dtype=float)
+    #all_positions = all_positions[eq_timesteps:]
     # get velocities
     process_vel = subprocess.Popen(["grep","<-- V",f"{fname}.md"],stdout=subprocess.PIPE)
     all_velocities = np.fromiter(map(float,subprocess.check_output(["awk","{print $3,$4,$5}"],stdin=process_vel.stdout).decode("utf-8").split()),dtype=float)
+    #all_velocities = all_velocities[eq_timesteps:]
     # dimensions
     coords = 3
     atom_count = len(atoms)
@@ -140,6 +191,10 @@ def parse_md(fname):
     # reshape and make float
     all_positions = np.reshape(all_positions,(timesteps,atom_count,coords))
     all_velocities = np.reshape(all_velocities,(timesteps,atom_count,coords))
+
+    timesteps -= eq_timesteps
+    all_positions = all_positions[eq_timesteps:]
+    all_velocities = all_velocities[eq_timesteps:]
 
     md = md_run(timesteps,atoms,all_positions,all_velocities)
     return md
@@ -190,7 +245,6 @@ def parse_cell(fname):
     cell_info = cell(lattice, position)
     return cell_info
 
-
 def calc_r_eq_from_md(md):
     """calculates r_eq as the average of positions from a .md file
 
@@ -215,16 +269,13 @@ def get_r_eq_from_cell(seed):
     cell = parse_cell(seed)
     return cell.positions
 
-def calc_cov_matrix(md,atoms,r_eqm):
-    cov_mat = np.zeros((len(atoms),3,3))
-    for frame in md:
-        for i in range(len(atoms)):
-            #cov_mat[i]
-            disp1 = np.reshape((np.asarray(frame.positions[i]) - r_eqm[i]),(3,1))
-            disp2 = np.reshape(disp1,(1,3))
-            cov_mat[i] += np.matmul(disp1,disp2)
-    cov_mat /= len(md)
-    return cov_mat
+def calculate_covariance_matrix(md,r_eq):
+    covariance_matrix = np.zeros((len(md.atoms),3,3))*(md.positions[0,0,0].units**2)
+    for timestep in md.positions:
+        disp = timestep-r_eq
+        covariance_matrix += np.multiply(np.expand_dims(disp,2),np.expand_dims(disp,1))
+    covariance_matrix /= md.timesteps
+    return covariance_matrix
 
 def evals_evecs(cov_mat,atoms):
     axes = []
@@ -236,41 +287,20 @@ def evals_evecs(cov_mat,atoms):
         axes.append(temp)
     return axes
 
-def get_atom_pos(seed):
-    with open(f"{seed}.cell","r") as file:
-        cell = [line.strip().lower() for line in file.readlines()]
-    frac = False
-    if "%block positions_abs" in cell:
-        start = cell.index("%block positions_abs")+1
-        stop = cell.index("%endblock positions_abs")
-    else:
-        start = cell.index("%block positions_frac")+1
-        stop = cell.index("%endblock positions_frac")
-        frac = True
+def calculate_kinetic_energy_tensor(md):
+    v_tensor = np.zeros((len(md.atoms),3,3))*(md.velocities[0,0,0].units**2)
+    for timestep in md.velocities:
+        v_tensor += np.multiply(np.expand_dims(timestep,2),np.expand_dims(timestep,1))
+    v_tensor /= md.timesteps
+    v_tensor *= 0.5
+    ke_tensor = np.zeros(np.shape(v_tensor))*(v_tensor[0,0,0].units*masses["H"].units)
+    for i in range(len(md.atoms)):
+        ke_tensor[i,:,:] = v_tensor[i,:,:]*masses[md.atoms[i].split("-")[0]]
+    ke_tensor = ke_tensor.to("electron_volt")
+    return ke_tensor
 
-    lattice = []
-    if frac:
-        start_l = cell.index("%block lattice_cart")+1
-        stop_l = cell.index("%endblock lattice_cart")
-        for line in cell[start_l:stop_l]:
-            lattice.append(list(map(float,line.split())))
-    positions = []
-    for line in cell[start:stop]:
-        pos = list(map(float,line.split()[1:]))
-        positions.append(pos)
-    temp = []
-    if frac:
-        for pos in positions:
-            temp_pos = np.asarray([0.0,0.0,0.0])
-            for i in range(3):
-                temp_pos += pos[i]*np.asarray(lattice[i])
-                print(temp_pos)
-            print()
-            temp.append(list(temp_pos))
-        positions = temp
-    return positions
             
-def write_jmol_script(seed,axes,atoms,atom_pos):
+def write_jmol_script(seed,axes,atoms,atom_pos,scale):
     with open(f"{seed}_ellipsoid.spt","w") as file:
         for i in range(len(axes)):
             file.write(f"ellipsoid ID {atoms[i].replace("-","")} AXES ")
@@ -281,8 +311,8 @@ def write_jmol_script(seed,axes,atoms,atom_pos):
                 file.write("} ")
             file.write("center { ")
             for j in range(len(atom_pos[i])):
-                file.write(f"{atom_pos[i][j]} ")
-            file.write("} scale 5 ")
+                file.write(f"{atom_pos[i][j].magnitude} ")
+            file.write(f"}} scale {scale} ")
             file.write(f"color [x{jmol_colours[atoms[i].split("-")[0]]}]")
             file.write("\n")
 
@@ -296,7 +326,7 @@ if __name__ == "__main__":
         quit()
 
     print("parsing .md file")
-    md = parse_md(args.seed)
+    md = parse_md(args.seed,settings.settings["equilibration_timesteps"])
 
     r_eq = None
     if settings.settings["r_equilibrium"] == "zero":
@@ -309,7 +339,27 @@ if __name__ == "__main__":
         print("r_eq not calculated")
         quit()
 
+    if settings.settings["calculate_adp"]:
+        print("calculating covariance matrix")
+        covariance_matrix = calculate_covariance_matrix(md,r_eq)
+        print("calculating adp axes")
+        axes = evals_evecs(covariance_matrix,md.atoms)
 
+    if settings.settings["write_jmol"]:
+        print("writing jmol")
+        write_jmol_script(args.seed,axes,md.atoms,r_eq,settings.settings["jmol_scale"])
+
+    if settings.settings["calculate_ke"]:
+        print("calculating ke")
+        ke_tensor = calculate_kinetic_energy_tensor(md)
+        with open(f"{args.seed}_ke_tensor.dat","w") as file:
+            for i in range(len(md.atoms)):
+                file.write(f"{md.atoms[i]}\n")
+                for row in ke_tensor[i]:
+                    string = "    ".join(list(map(str,row.magnitude)))
+                    file.write(f"{string}\n")
+                file.write("\n\n")
+    #print(ke_tensor)
 #
     #cov_mat = calc_cov_matrix(md[settings.settings["equilibration_timesteps"]:],atoms,r_eqm)
     ##print(f"covariance matrix calc")
