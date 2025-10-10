@@ -25,13 +25,6 @@ jmol_colours = {"H":  "FFFFFF",
                 "F":  "90E050",
                 "Ne": "B3E3F5"}
 
-class md_frame:
-    def __init__(self):
-        self.time = None
-        self.positions = []
-        self.energy = None
-        self.velocities = []
-
 class md_run:
     def __init__(self,timesteps,atoms,positions,velocities):
         self.timesteps = timesteps
@@ -43,6 +36,16 @@ class md_run:
     def apply_units(self):
         self.positions*=ureg.a_u_length
         self.velocities*=(ureg.a_u_length/ureg.a_u_time)
+
+class cell:
+    def __init__(self,lattice,positions):
+        self.lattice = lattice
+        self.positions = positions
+        self.apply_units()
+
+    def apply_units(self):
+        self.lattice*=ureg.angstrom
+        self.positions*=ureg.angstrom
 
 class adp_settings:
     def __init__(self,seed):
@@ -109,7 +112,7 @@ def parse_md(fname):
         fname (str): file name of the .md file
 
     Returns:
-        _md_run: object containing data from the md run
+        md_run: object containing data from the md run
     """
     atoms = []
     # start and stop index for first md timestep
@@ -141,16 +144,76 @@ def parse_md(fname):
     md = md_run(timesteps,atoms,all_positions,all_velocities)
     return md
 
+def parse_cell(fname):
+    """parses a CASTEP .cell file, returning a cell object with data
 
+    Args:
+        fname (str): file name of the .cell file
+
+    Returns:
+        cell: object containing cell file data
+    """
+    with open(f"{fname}.cell","r") as file:
+        cell_file = [line.strip().lower() for line in file.readlines()]
+    # need a lattice block and a positions block
+    lattice_type = None
+    position_type = None
+    if "%block lattice_abc" in cell_file:
+        lattice_type = "abc"
+    elif "%block lattice_cart" in cell_file:
+        lattice_type = "cart"
+    if "%block positions_frac" in cell_file:
+        position_type = "frac"
+    elif "%block positions_abs" in cell_file:
+        position_type = "abs"
+
+    # get positions in cell file
+    l_start = cell_file.index(f"%block lattice_{lattice_type}")+1
+    l_stop = cell_file.index(f"%endblock lattice_{lattice_type}")
+    p_start = cell_file.index(f"%block positions_{position_type}")+1
+    p_stop = cell_file.index(f"%endblock positions_{position_type}")
+
+    # md writes out in cartesians -> need this to be in cartesians too
+    # read in the lattice
+    if lattice_type == "cart":
+        lattice = np.asarray([line.split() for line in cell_file[l_start:l_stop]],dtype=float)
+    elif lattice_type == "abc":
+        print("lattice_abc not yet supported")
+        quit()
+    # read in the positions
+    position = np.asarray([line.split()[1:4] for line in cell_file[p_start:p_stop]],dtype=float)
+    # if positions given in fractional, convert to absolute
+    if position_type == "frac":
+        for i in range(len(position)):
+            position[i] = np.matmul(lattice,position[i])
+    
+    cell_info = cell(lattice, position)
+    return cell_info
 
 
 def calc_r_eq_from_md(md):
+    """calculates r_eq as the average of positions from a .md file
+
+    Args:
+        md (md_run): object containing data from CASTEP .md file
+
+    Returns:
+        arr: array of atomic equilibrium positions (dimension [number of atoms, 3])
+    """
+    # set up positions array with units from the .md file (atomic units)
     r_eq = np.zeros((len(md.atoms),3))*md.positions[0,0,0].units
+    # add up all positions
     for timestep in md.positions:
         r_eq += timestep
+    # convert to angstroms
     r_eq = r_eq.to("angstrom")
+    # average over timesteps
     r_eq /= md.timesteps
     return r_eq
+
+def get_r_eq_from_cell(seed):
+    cell = parse_cell(seed)
+    return cell.positions
 
 def calc_cov_matrix(md,atoms,r_eqm):
     cov_mat = np.zeros((len(atoms),3,3))
@@ -233,36 +296,20 @@ if __name__ == "__main__":
         quit()
 
     print("parsing .md file")
-    s = time.time()
     md = parse_md(args.seed)
-    print(f"parsing .md: {time.time()-s}")
 
     r_eq = None
     if settings.settings["r_equilibrium"] == "zero":
         print("reading r_eq")
-        # read from cell file
-        pass
+        r_eq = get_r_eq_from_cell(args.seed)
     elif settings.settings["r_equilibrium"] == "finite":
         print("calculating r_eq")
-        s = time.time()
         r_eq = calc_r_eq_from_md(md)
-        print(f"calculating r_eq: {time.time()-s}")
     if r_eq is None:
         print("r_eq not calculated")
         quit()
-    #if settings.settings["r_equilibrium"] == "zero":
-    #    if not os.path.isfile(f"{args.seed}.cell"):
-    #        print(f"file not found {args.seed}.cell, r_equilibrium at T=0K requires a .cell file")
-    #        quit()
-    #    print("r_equilibrium at T=0K is not yet implemented")
-    #else:
-    #    if settings.settings["r_equilibrium"] == "finite":
-    #        r_eqm = calc_r_eqm(md[settings.settings["equilibration_timesteps"]:],atoms)
-    #    elif settings.settings["r_equilibrium"] == "time":
-    #        print("time-varying r_equilibrium is not yet implemented")
-    #        quit()
-#
-    #print(r_eqm)
+
+
 #
     #cov_mat = calc_cov_matrix(md[settings.settings["equilibration_timesteps"]:],atoms,r_eqm)
     ##print(f"covariance matrix calc")
