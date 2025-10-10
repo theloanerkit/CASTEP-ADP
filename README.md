@@ -1,6 +1,8 @@
 # CASTEP-ADP tool
 ```.adp``` input file should have filename ```<seed>.adp```
 
+to run the tool in command line: ```python3 castep-adp.py -s <seed>```
+
 ## input file parameters
 ```calculate_adp```: calculate the atomic displacement paramters, default value = True (cannot be false if ```write_jmol``` is set to True)
 
