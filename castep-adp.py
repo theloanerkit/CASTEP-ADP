@@ -5,12 +5,25 @@ from copy import deepcopy as cp
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as sc
-import colours as c
+import time
+import subprocess
+import struct
 
 ureg = pint.UnitRegistry()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s","--seed",help="seedname for the files (.md/.phonon/.cell/.adp)")
+
+jmol_colours = {"H":  "FFFFFF",
+                "He": "D9FFFF",
+                "Li": "CC80FF",
+                "Be": "C2FF00",
+                "B":  "FFB5B5",
+                "C":  "909090",
+                "N":  "3050F8",
+                "O":  "FF0D0D",
+                "F":  "90E050",
+                "Ne": "B3E3F5"}
 
 class md_frame:
     def __init__(self):
@@ -18,6 +31,18 @@ class md_frame:
         self.positions = []
         self.energy = None
         self.velocities = []
+
+class md_run:
+    def __init__(self,timesteps,atoms,positions,velocities):
+        self.timesteps = timesteps
+        self.atoms = atoms
+        self.positions = positions
+        self.velocities = velocities
+        self.apply_units()
+
+    def apply_units(self):
+        self.positions*=ureg.a_u_length
+        self.velocities*=(ureg.a_u_length/ureg.a_u_time)
 
 class adp_settings:
     def __init__(self,seed):
@@ -69,90 +94,63 @@ class adp_settings:
             print(f"unexpected value {self.settings["write_jmol"]} for write_jmol, expected true or false")
 
         # checking r_equilibrium
-        if self.valid and self.settings["r_equilibrium"] not in ["finite", "zero", "time"]:
+        if self.valid and self.settings["r_equilibrium"] not in ["finite", "zero"]: # add time later as an option
             self.valid = False
             print(f"unexpected value {self.settings["r_equilibrium"]} for r_equilibrium, expected one of finite/zero/time")
 
+#def loading_bar(percent,msg):
+#    string = f"{msg} [{"#"*percent}{" "*(50-percent)}]"
+#    print(string,end="\r")
+
 def parse_md(fname):
-    # read in .md file
-    with open(f"{fname}.md","r") as file:
-        data = [line.strip() for line in file.readlines()]
-    
-    # skip header
-    start = data.index("END header")
-    data = data[start:]
+    """parses a CASTEP .md file, returning a md_run object with data
 
-    get_atoms = True
+    Args:
+        fname (str): file name of the .md file
+
+    Returns:
+        _md_run: object containing data from the md run
+    """
     atoms = []
-    frame = None
-    frames = []
+    # start and stop index for first md timestep
+    start = int(subprocess.check_output(["grep","-m","1","-n","<-- R",f"{fname}.md"]).decode("utf-8").strip().split(":")[0])-1
+    stop = int(subprocess.check_output(["grep","-m","1","-n","<-- V",f"{fname}.md"]).decode("utf-8").strip().split(":")[0])-1
 
-    for i in range(len(data)):
-        if len(data[i]) == 0: # empty line -> new md timestep
-            if frame is not None: # we have done at least one timestep
-                get_atoms = False
-                frames.append(frame)
-            frame = md_frame()
-        if "<-- R" in data[i]: # position line
-            line = data[i].split()
-            if get_atoms: # we haven't recorded the atoms yet
-                atoms.append("-".join(line[0:2]))
-            frame.positions.append(list(map(float,line[2:5]))) # add position to frame position array
-        if "<-- V" in data[i]: # velocity line
-            line = data[i].split()
-            frame.velocities.append(list(map(float,line[2:5]))) # add velocity to frame velocity array
-        if "<-- E" in data[i]: # energy line
-            frame.time = float(data[i-1]) # time is on the line before energy
-            frame.energy = float(data[i].split()[0])
-    return frames, atoms
+    atoms = []
+    # get atom labels from first md timestep
+    with open(f"{fname}.md") as file:
+        for i, line in enumerate(file):
+            if i >= start and i < stop:
+                atoms.append("-".join(line.split()[0:2]))
+            if i >= stop:
+                break
+    # get positions
+    process_pos = subprocess.Popen(["grep","<-- R",f"{fname}.md"],stdout=subprocess.PIPE)
+    all_positions = np.fromiter(map(float,subprocess.check_output(["awk","{print $3,$4,$5}"],stdin=process_pos.stdout).decode("utf-8").split()),dtype=float)
+    # get velocities
+    process_vel = subprocess.Popen(["grep","<-- V",f"{fname}.md"],stdout=subprocess.PIPE)
+    all_velocities = np.fromiter(map(float,subprocess.check_output(["awk","{print $3,$4,$5}"],stdin=process_vel.stdout).decode("utf-8").split()),dtype=float)
+    # dimensions
+    coords = 3
+    atom_count = len(atoms)
+    timesteps = int(len(all_positions)/(atom_count*coords))
+    # reshape and make float
+    all_positions = np.reshape(all_positions,(timesteps,atom_count,coords))
+    all_velocities = np.reshape(all_velocities,(timesteps,atom_count,coords))
 
-#def parse_files(seed):
-#    print("parsing md file")
-#    frames, atoms = parse_md(seed)
-#
-#    #with open(f"{seed}.md","r") as file:
-#    #    data = [line.strip() for line in file.readlines()]
-#    #atoms = []
-#    #get_atoms = True
-#    #positions = []
-#    #velocities = []
-#    #frames = []
-#    #frame = None
-#    #start = data.index("END header")
-#    #data = data[start:]
-#    #for i in range(len(data)):
-#    #    if len(data[i]) == 0:
-#    #        if frame is not None:
-#    #            get_atoms = False
-#    #            frame.positions = cp(positions)
-#    #            frame.velocities = cp(velocities)
-#    #            frames.append(frame)
-#    #            positions = []
-#    #            velocities = []
-#    #        frame = md_frame()
-#    #    if "<-- R" in data[i]:
-#    #        line = data[i].split()
-#    #        if get_atoms:
-#    #            atoms.append("".join(line[0:2]))
-#    #        pos = list(map(float,line[2:5]))
-#    #        positions.append(pos)
-#    #    if "<-- V" in data[i]:
-#    #        line = data[i].split()
-#    #        vel = list(map(float,line[2:5]))
-#    #        velocities.append(vel)
-#    #    if "<-- E" in data[i]:
-#    #        frame.time = (float(data[i-1])*ureg.a_u_time).to("s").magnitude
-#    #        frame.energy = (float(data[i].split()[0])*ureg.a_u_energy).to("electron_volt").magnitude
-#    return frames, atoms
+    md = md_run(timesteps,atoms,all_positions,all_velocities)
+    return md
 
-def calc_r_eqm(md,atoms):
-    r_eqm = np.zeros((len(atoms),3))
-    for frame in md:
-        for i in range(len(atoms)):
-            r_eqm[i] += frame.positions[i]
-    r_eqm /= len(md)
 
-    return r_eqm
+
+
+def calc_r_eq_from_md(md):
+    r_eq = np.zeros((len(md.atoms),3))*md.positions[0,0,0].units
+    for timestep in md.positions:
+        r_eq += timestep
+    r_eq = r_eq.to("angstrom")
+    r_eq /= md.timesteps
+    return r_eq
 
 def calc_cov_matrix(md,atoms,r_eqm):
     cov_mat = np.zeros((len(atoms),3,3))
@@ -222,37 +220,55 @@ def write_jmol_script(seed,axes,atoms,atom_pos):
             for j in range(len(atom_pos[i])):
                 file.write(f"{atom_pos[i][j]} ")
             file.write("} scale 5 ")
-            file.write(f"color [x{c.jmol_colours[atoms[i].split("-")[0]]}]")
+            file.write(f"color [x{jmol_colours[atoms[i].split("-")[0]]}]")
             file.write("\n")
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
     settings = adp_settings(args.seed)
+
     if not os.path.isfile(f"{args.seed}.md"):
         print(f"file not found {args.seed}.md")
         quit()
 
-    md, atoms = parse_md(args.seed)
+    print("parsing .md file")
+    s = time.time()
+    md = parse_md(args.seed)
+    print(f"parsing .md: {time.time()-s}")
+
+    r_eq = None
     if settings.settings["r_equilibrium"] == "zero":
-        if not os.path.isfile(f"{args.seed}.cell"):
-            print(f"file not found {args.seed}.cell, r_equilibrium at T=0K requires a .cell file")
-            quit()
-        print("r_equilibrium at T=0K is not yet implemented")
-    else:
-        if settings.settings["r_equilibrium"] == "finite":
-            r_eqm = calc_r_eqm(md[settings.settings["equilibration_timesteps"]:],atoms)
-        elif settings.settings["r_equilibrium"] == "time":
-            print("time-varying r_equilibrium is not yet implemented")
-            quit()
-
-    print(r_eqm)
-
-    cov_mat = calc_cov_matrix(md[settings.settings["equilibration_timesteps"]:],atoms,r_eqm)
-    #print(f"covariance matrix calc")
-    evecs = evals_evecs(cov_mat,atoms)
-    if settings.settings["write_jmol"]:
-        write_jmol_script(args.seed,evecs,atoms,((r_eqm*ureg.a_u_length).to("angstrom")).magnitude)
+        print("reading r_eq")
+        # read from cell file
+        pass
+    elif settings.settings["r_equilibrium"] == "finite":
+        print("calculating r_eq")
+        s = time.time()
+        r_eq = calc_r_eq_from_md(md)
+        print(f"calculating r_eq: {time.time()-s}")
+    if r_eq is None:
+        print("r_eq not calculated")
+        quit()
+    #if settings.settings["r_equilibrium"] == "zero":
+    #    if not os.path.isfile(f"{args.seed}.cell"):
+    #        print(f"file not found {args.seed}.cell, r_equilibrium at T=0K requires a .cell file")
+    #        quit()
+    #    print("r_equilibrium at T=0K is not yet implemented")
+    #else:
+    #    if settings.settings["r_equilibrium"] == "finite":
+    #        r_eqm = calc_r_eqm(md[settings.settings["equilibration_timesteps"]:],atoms)
+    #    elif settings.settings["r_equilibrium"] == "time":
+    #        print("time-varying r_equilibrium is not yet implemented")
+    #        quit()
+#
+    #print(r_eqm)
+#
+    #cov_mat = calc_cov_matrix(md[settings.settings["equilibration_timesteps"]:],atoms,r_eqm)
+    ##print(f"covariance matrix calc")
+    #evecs = evals_evecs(cov_mat,atoms)
+    #if settings.settings["write_jmol"]:
+    #    write_jmol_script(args.seed,evecs,atoms,((r_eqm*ureg.a_u_length).to("angstrom")).magnitude)
     #print("writing jmol")
     #if write_jmol:
     #    pos = get_atom_pos(args.seed)

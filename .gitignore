@@ -9,3 +9,5 @@ plot.py
 *.spt
 *.txt
 !README.md
+*.adp
+/__pycache__
