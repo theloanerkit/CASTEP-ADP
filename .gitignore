@@ -8,3 +8,4 @@
 plot.py
 *.spt
 *.txt
+!README.md
