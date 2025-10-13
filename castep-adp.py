@@ -93,7 +93,7 @@ class adp_settings:
                          "write_uij":False,
                          "write_adp":False,
                          "write_ke":False,
-                         "calculate_r_eq":True,
+                         #"calculate_r_eq":True,
                          "write_r_eq":True
                          }
         self.user_def = {"equilibration_timesteps":False,
@@ -105,7 +105,7 @@ class adp_settings:
                          "write_uij":False,
                          "write_adp":False,
                          "write_ke":False,
-                         "calculate_r_eq":False,
+                         #"calculate_r_eq":False,
                          "write_r_eq":False
                          }
         self.valid = True
@@ -127,6 +127,7 @@ class adp_settings:
             v = v.strip()
             if k not in self.settings.keys():
                 print(f"unknown paramter: {k}")
+                self.valid = False
                 break
             else:
                 self.settings[k] = v
@@ -198,9 +199,9 @@ class adp_settings:
             self.settings["write_ke"] = True
 
         # checking calculate_r_eq
-        self.check_boolean("calculate_r_eq")
-        if self.valid and self.settings["calculate_r_eq"]:
-            self.settings["write_r_eq"] = True
+        #self.check_boolean("calculate_r_eq")
+        #if self.valid and self.settings["calculate_r_eq"]:
+        #    self.settings["write_r_eq"] = True
 
         # checking write_adp
         self.check_boolean("write_adp")
@@ -219,7 +220,7 @@ class adp_settings:
         self.fix_dependencies("write_adp","calculate_adp")
         self.fix_dependencies("write_uij","calculate_adp")
         self.fix_dependencies("write_ke","calculate_ke")
-        self.fix_dependencies("write_r_eq","calculate_r_eq")
+        #self.fix_dependencies("write_r_eq","calculate_r_eq")
 
 
 

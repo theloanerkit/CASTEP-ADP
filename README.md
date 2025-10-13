@@ -10,8 +10,6 @@ there is an optional ```--dryrun``` flag: ```python3 castep-adp.py -s <seed> --d
 
 ```calculate_ke```: calculate the kinetic energy tensor from averaged velocities from a .md file, default value = False
 
-```calculate_r_eq```:
-
 ```equilibration_timesteps```: number of equilibration timesteps for the MD calculation, default value = 0
 
 ```r_equilibrium```: specifies the method used to calculate $r_{eq}$ for calculating $U$, default value = finite 
@@ -25,6 +23,6 @@ there is an optional ```--dryrun``` flag: ```python3 castep-adp.py -s <seed> --d
 
 ```write_jmol```: writes a jmol script (.spt) file to display the atomic displacement parameter ellipsoids in jmol, default value = False
 
-```write_r_eq```:
+```write_r_eq```: writes the equilibrium position, calculated by method specified in ```r_equilibrium```
 
 ```write_uij```: writes the covariance matrix $U_{ij}=\langle \Delta x_i \Delta x_j\rangle$ for the atomic displacement parameter, default value = True if ```calculate_adp``` is True, otherwise False 
