@@ -13,3 +13,4 @@ plot.py
 /__pycache__
 !example.adp
 *.dat
+*.out

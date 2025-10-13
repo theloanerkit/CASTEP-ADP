@@ -11,6 +11,13 @@ ureg = pint.UnitRegistry()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s","--seed",help="seedname for the files (.md/.phonon/.cell/.adp)")
+parser.add_argument("--dryrun",action="store_true")
+
+
+col_short = 4
+col = 12
+col_num = 24
+col_long = 30
 
 jmol_colours = {"H":  "FFFFFF",
                 "He": "D9FFFF",
@@ -82,8 +89,25 @@ class adp_settings:
                          "r_equilibrium":"finite", # finite, zero, time
                          "calculate_adp":True,
                          "jmol_scale":5,
-                         "calculate_ke":False
-                         } 
+                         "calculate_ke":False,
+                         "write_uij":False,
+                         "write_adp":False,
+                         "write_ke":False,
+                         "calculate_r_eq":True,
+                         "write_r_eq":True
+                         }
+        self.user_def = {"equilibration_timesteps":False,
+                         "write_jmol":False,
+                         "r_equilibrium":False,
+                         "calculate_adp":False,
+                         "jmol_scale":False,
+                         "calculate_ke":False,
+                         "write_uij":False,
+                         "write_adp":False,
+                         "write_ke":False,
+                         "calculate_r_eq":False,
+                         "write_r_eq":False
+                         }
         self.valid = True
         self.parse()
         self.check()
@@ -106,52 +130,97 @@ class adp_settings:
                 break
             else:
                 self.settings[k] = v
+                self.user_def[k] = True
+
+    def check_boolean(self,key):
+        if self.valid and self.settings[key] in ["t","true",True]:
+            self.settings[key] = True
+        elif self.valid and self.settings[key] in ["f","false",False]:
+            self.settings[key] = False
+        else:
+            self.valid = False
+            print(f"unexpected value {self.settings[key]} for {key}, expected true or false")
+
+    def check_int(self,key,bounds=(None,None),non_neg=False):
+        if not self.valid:
+            return
+        try:
+            self.settings[key] = int(self.settings[key])
+        except:
+            self.valid = False
+            print(f"{key} must be an integer, got {self.settings[key]}")
+
+    def check_float(self,key):
+        if not self.valid:
+            return
+        try:
+            self.settings[key] = float(self.settings[key])
+        except:
+            self.valid = False
+            print(f"{key} must be a float, got {self.settings[key]}")
+
+    def check_bounds(self,key,bounds,equal=False):
+        pass
+
+    def check_non_neg(self,key):
+        if self.valid and self.settings[key] < 0:
+            self.valid = False
+            print(f"{key} must be non-negative, got {self.settings[key]}")
+
+    def check_keywords(self,key,keywords):
+        if self.valid and self.settings[key] not in keywords:
+            self.valid = False
+            print(f"unexpected value {self.settings[key]} for {key}, expected one of {"/".join(keywords)}")
+
+    def fix_dependencies(self,key1,key2):
+        if self.valid and self.settings[key1] and not self.settings[key2]:
+            self.settings[key2] = True
 
     def check(self):
         # checking equilibration_timesteps
-        try:
-            self.settings["equilibration_timesteps"] = int(self.settings["equilibration_timesteps"])
-        except:
-            self.valid = False
-            print(f"equilibration_timesteps must be an integer, got {self.settings["equilibration_timesteps"]}")
-        if self.valid and self.settings["equilibration_timesteps"] < 0:
-            self.valid = False
-            print(f"equilibration_timesteps must be non-negative, got {self.settings["equilibration_timesteps"]}")
+        self.check_int("equilibration_timesteps")
+        self.check_non_neg("equilibration_timesteps")
 
         # checking write_jmol
-        if self.valid and self.settings["write_jmol"] in ["t","true",True]:
-            self.settings["write_jmol"] = True
-        elif self.valid and self.settings["write_jmol"] in ["f","false",False]:
-            self.settings["write_jmol"] = False
-        else:
-            self.valid = False
-            print(f"unexpected value {self.settings["write_jmol"]} for write_jmol, expected true or false")
+        self.check_boolean("write_jmol")
 
         # checking r_equilibrium
-        if self.valid and self.settings["r_equilibrium"] not in ["finite", "zero"]: # add time later as an option
-            self.valid = False
-            print(f"unexpected value {self.settings["r_equilibrium"]} for r_equilibrium, expected one of finite/zero/time")
+        self.check_keywords("r_equilibrium",["finite","zero"]) # time to be added
 
         # checking calculate_adp
-        if self.valid and self.settings["calculate_adp"] in ["t","true",True]:
-            self.settings["calculate_adp"] = True
-        elif self.valid and self.settings["calculate_adp"] in ["f","false",False]:
-            self.settings["calcuate_adp"] = False
-        else:
-            self.valid = False
-            print(f"unexpected value {self.settings["calculate_adp"]} for calculate_adp, expected true or false")
-        if self.valid and self.settings["write_jmol"] and not self.settings["calculate_adp"]:
-            self.valid = False
-            print(f"calculate_adp cannot be set to false if write_jmol is true")
+        self.check_boolean("calculate_adp")
+        if self.valid and self.settings["calculate_adp"]:
+            self.settings["write_uij"] = True
 
         # checking calculate_ke
-        if self.valid and self.settings["calculate_ke"] in ["t","true",True]:
-            self.settings["calculate_ke"] = True
-        elif self.valid and self.settings["calculate_ke"] in ["f","false",False]:
-            self.settings["calculate_ke"] = False
-        else:
-            self.valid = False
-            print(f"unexpected value {self.settings["calculate_ke"]} for calculate_ke, expected true or false")
+        self.check_boolean("calculate_ke")
+        if self.valid and self.settings["calculate_ke"]:
+            self.settings["write_ke"] = True
+
+        # checking calculate_r_eq
+        self.check_boolean("calculate_r_eq")
+        if self.valid and self.settings["calculate_r_eq"]:
+            self.settings["write_r_eq"] = True
+
+        # checking write_adp
+        self.check_boolean("write_adp")
+
+        # checking write_uij
+        self.check_boolean("write_uij")
+
+        # checking write_ke
+        self.check_boolean("write_ke")
+
+        # checking write_r_eq
+        self.check_boolean("write_r_eq")
+
+        # --- dependencies ---
+        self.fix_dependencies("write_jmol","calculate_adp")
+        self.fix_dependencies("write_adp","calculate_adp")
+        self.fix_dependencies("write_uij","calculate_adp")
+        self.fix_dependencies("write_ke","calculate_ke")
+        self.fix_dependencies("write_r_eq","calculate_r_eq")
+
 
 
 def parse_md(fname,eq_timesteps):
@@ -275,6 +344,7 @@ def calculate_covariance_matrix(md,r_eq):
         disp = timestep-r_eq
         covariance_matrix += np.multiply(np.expand_dims(disp,2),np.expand_dims(disp,1))
     covariance_matrix /= md.timesteps
+    covariance_matrix = covariance_matrix.to("angstrom**2")
     return covariance_matrix
 
 def evals_evecs(cov_mat,atoms):
@@ -316,49 +386,136 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale):
             file.write(f"color [x{jmol_colours[atoms[i].split("-")[0]]}]")
             file.write("\n")
 
+def extend_str(string,l,start=True):
+    string = f"{string}{" "*(l-len(string))}"
+    if start:
+        string = f"  {string}"
+    else:
+        string = f"{string}  "
+    return string
+
+def num_to_str(num):
+    num = f"{num}"
+    if num[0] == "-":
+        num = f" {num}"
+    else:
+        num = f"  {num}"
+    return num
+
+def write_header(file,settings,keys):
+    file.write("begin HEADER\n\n")
+    file.write("--- Parameters ---\n")
+    for k in keys:
+        if settings.user_def[k]:
+            file.write(extend_str("<users>",col))
+        else:
+            file.write(extend_str("<defualt>",col))
+        file.write(extend_str(k,col_long))
+        file.write(f"{settings.settings[k]}")
+        file.write("\n")
+    file.write("\n")
+    file.write("--- Outputs ---\n")
+    file.write(f"{extend_str("<r_eq>",12)}{extend_str("x",col_num)}{extend_str("y",col_num)}{extend_str("z",col_num)}angstrom\n")
+    if settings.settings["write_adp"]:
+        file.write(f"{extend_str("<adp>",12)}{extend_str("x",col_num)}{extend_str("y",col_num)}{extend_str("z",col_num)}angstrom\n")
+    if settings.settings["write_uij"]:
+        file.write(f"{extend_str("<uij>",12)}{extend_str("xx",col_num)}{extend_str("xy",col_num)}{extend_str("xz",col_num)}angstrom^2\n")
+        file.write(f"{extend_str("<uij>",12)}{extend_str("yx",col_num)}{extend_str("yy",col_num)}{extend_str("yz",col_num)}angstrom^2\n")
+        file.write(f"{extend_str("<uij>",12)}{extend_str("zx",col_num)}{extend_str("zy",col_num)}{extend_str("zz",col_num)}angstrom^2\n")
+    if settings.settings["write_ke"]:
+        file.write(f"{extend_str("<ke>",12)}{extend_str("xx",col_num)}{extend_str("xy",col_num)}{extend_str("xz",col_num)}electron-volt\n")
+        file.write(f"{extend_str("<ke>",12)}{extend_str("yx",col_num)}{extend_str("yy",col_num)}{extend_str("yz",col_num)}electron-volt\n")
+        file.write(f"{extend_str("<ke>",12)}{extend_str("zx",col_num)}{extend_str("zy",col_num)}{extend_str("zz",col_num)}electron-volt\n")
+    file.write("\n")
+    file.write("end HEADER\n\n")
+
+def write_3_vec(vec):
+    string = ""
+    for i in range(len(vec)):
+        if isinstance(vec[i],np.complex128):
+            vec[i] = vec[i].real
+        string += extend_str(num_to_str(vec[i]),col_num,start=False)
+    return string
+
+def write_out(seed,settings,data,dryrun):
+    keys = list(settings.settings.keys())
+    keys.sort()
+    with open(f"{seed}.out","w") as file:
+        write_header(file,settings,keys)
+        if not dryrun:
+            for i in range(len(data["atoms"])):
+                name,num = data["atoms"][i].split("-")
+                file.write(f"{extend_str("<atom>",col)}{extend_str(name,col_short)}{num}\n")
+                file.write(f"{extend_str("<r_eq>",col)}{write_3_vec(data["r_eq"][i].magnitude)}\n")
+                if settings.settings["write_adp"]:
+                    for vec in data["adp"][i]:
+                        file.write(f"{extend_str("<adp>",col)}{write_3_vec(vec)}\n")
+                if settings.settings["write_uij"]:
+                    for vec in data["uij"][i]:
+                        file.write(f"{extend_str("<uij>",col)}{write_3_vec(vec.magnitude)}\n")
+                if settings.settings["write_ke"]:
+                    for vec in data["ke"][i]:
+                        file.write(f"{extend_str("<ke>",col)}{write_3_vec(vec.magnitude)}\n")
+
+                file.write("\n")
+
+
 if __name__ == "__main__":
     args = parser.parse_args()
-
     settings = adp_settings(args.seed)
+    data = {"atoms":None,
+            "r_eq":None,
+            "adp":None,
+            "uij":None}
+    if not args.dryrun:
+        if not os.path.isfile(f"{args.seed}.md"):
+            print(f"file not found {args.seed}.md")
+            quit()
 
-    if not os.path.isfile(f"{args.seed}.md"):
-        print(f"file not found {args.seed}.md")
-        quit()
+        print("parsing .md file")
+        md = parse_md(args.seed,settings.settings["equilibration_timesteps"])
+        data["atoms"] = md.atoms
 
-    print("parsing .md file")
-    md = parse_md(args.seed,settings.settings["equilibration_timesteps"])
+        r_eq = None
+        if settings.settings["r_equilibrium"] == "zero":
+            print("reading r_eq")
+            r_eq = get_r_eq_from_cell(args.seed)
+        elif settings.settings["r_equilibrium"] == "finite":
+            print("calculating r_eq")
+            r_eq = calc_r_eq_from_md(md)
+        if r_eq is None:
+            print("r_eq not calculated")
+            quit()
+        r_eq = r_eq.to("angstrom")
+        data["r_eq"] = r_eq
 
-    r_eq = None
-    if settings.settings["r_equilibrium"] == "zero":
-        print("reading r_eq")
-        r_eq = get_r_eq_from_cell(args.seed)
-    elif settings.settings["r_equilibrium"] == "finite":
-        print("calculating r_eq")
-        r_eq = calc_r_eq_from_md(md)
-    if r_eq is None:
-        print("r_eq not calculated")
-        quit()
+        if settings.settings["calculate_adp"]:
+            print("calculating covariance matrix")
+            covariance_matrix = calculate_covariance_matrix(md,r_eq)
+            print("calculating adp axes")
+            axes = evals_evecs(covariance_matrix,md.atoms)
+            if settings.settings["write_adp"]:
+                data["adp"] = axes
+            if settings.settings["write_uij"]:
+                data["uij"] = covariance_matrix
 
-    if settings.settings["calculate_adp"]:
-        print("calculating covariance matrix")
-        covariance_matrix = calculate_covariance_matrix(md,r_eq)
-        print("calculating adp axes")
-        axes = evals_evecs(covariance_matrix,md.atoms)
+        if settings.settings["write_jmol"]:
+            print("writing jmol")
+            write_jmol_script(args.seed,axes,md.atoms,r_eq,settings.settings["jmol_scale"])
 
-    if settings.settings["write_jmol"]:
-        print("writing jmol")
-        write_jmol_script(args.seed,axes,md.atoms,r_eq,settings.settings["jmol_scale"])
+        if settings.settings["calculate_ke"]:
+            print("calculating ke")
+            ke_tensor = calculate_kinetic_energy_tensor(md)
+            data["ke"] = ke_tensor
+        #with open(f"{args.seed}_ke_tensor.dat","w") as file:
+        #    for i in range(len(md.atoms)):
+        #        file.write(f"{md.atoms[i]}\n")
+        #        for row in ke_tensor[i]:
+        #            string = "    ".join(list(map(str,row.magnitude)))
+        #            file.write(f"{string}\n")
+        #        file.write("\n\n")
 
-    if settings.settings["calculate_ke"]:
-        print("calculating ke")
-        ke_tensor = calculate_kinetic_energy_tensor(md)
-        with open(f"{args.seed}_ke_tensor.dat","w") as file:
-            for i in range(len(md.atoms)):
-                file.write(f"{md.atoms[i]}\n")
-                for row in ke_tensor[i]:
-                    string = "    ".join(list(map(str,row.magnitude)))
-                    file.write(f"{string}\n")
-                file.write("\n\n")
+    write_out(args.seed,settings,data,args.dryrun)
     #print(ke_tensor)
 #
     #cov_mat = calc_cov_matrix(md[settings.settings["equilibration_timesteps"]:],atoms,r_eqm)
