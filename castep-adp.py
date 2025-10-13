@@ -5,8 +5,6 @@ import numpy as np
 import scipy.linalg as sc
 import subprocess
 
-import time
-
 ureg = pint.UnitRegistry()
 
 parser = argparse.ArgumentParser()
