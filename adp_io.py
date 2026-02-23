@@ -1,0 +1,169 @@
+import adp_constants
+import numpy as np
+
+col = 12
+col_num = 24
+col_long = 32
+
+def extend_str(string,width):
+    string = " "+string
+    string = string + " "*(width-len(string))
+    return string
+
+def vec_to_string(vec):
+    string = []
+    for v in vec:
+        try:
+            num = v.magnitude
+        except:
+            num = v
+        num = f"{num}"
+        if num[0] != "-":
+            num = " "+num
+        string.append(num)
+    return string
+
+def write_columns(cols,width):
+    string = ""
+    for c in cols:
+        string += extend_str(c,width)
+    return string
+
+def write_jmol_script(seed,axes,atoms,atom_pos,scale):
+    with open(f"{seed}_ellipsoid.spt","w") as file:
+        for i in range(len(axes)):
+            file.write(f"ellipsoid ID {atoms[i].replace(" ","")} AXES ")
+            for j in range(len(axes[i])):
+                file.write("{ ")
+                for k in range(len(axes[i][j])):
+                    file.write(f"{float(axes[i][j][k])} ")
+                file.write("} ")
+            file.write("center { ")
+            for j in range(len(atom_pos[i])):
+                file.write(f"{atom_pos[i][j]} ")
+            file.write(f"}} scale {scale} ")
+            file.write(f"color [x{adp_constants.jmol_colours[atoms[i].split()[0]]}]")
+            file.write("\n")
+
+def write_header(file,keys,settings):
+    length_unit = settings.output_units["length"][1]
+    energy_unit = settings.output_units["energy"][1]
+    file.write("begin HEADER\n\n")
+    file.write(f"version={adp_constants.VERSION}\n\n")
+    file.write("--- Parameters ---\n")
+    for key in keys:
+        if settings.user_def[key]:
+            file.write(extend_str("<userdef>",col))
+        else:
+            file.write(extend_str("<default>",col))
+        file.write(extend_str(key,col_long))
+        file.write(f"{settings.settings[key]}\n")
+    file.write("\n")
+    file.write("--- Outputs ---\n")
+    # write out r_eq
+    string = extend_str("<r_eq>",col)
+    string += write_columns(["x","y","z"],col_num)
+    string += length_unit
+    file.write(f"{string}\n\n")
+
+    if settings.settings["write_adp"]:
+        string = extend_str("<adp>",col)
+        string += write_columns(["x","y","z"],col_num)
+        string += length_unit
+        file.write(f"{string}\n\n")
+
+    if settings.settings["write_uij"]:
+        string = extend_str("<uij>",col)
+        string1 = write_columns(["xx","xy","xz"],col_num)
+        string2 = write_columns(["yx","yy","yz"],col_num)
+        string3 = write_columns(["zx","zy","zz"],col_num)
+        unit = length_unit
+        file.write(f"{string}{string1}{unit}^2\n")
+        file.write(f"{string}{string2}{unit}^2\n")
+        file.write(f"{string}{string3}{unit}^2\n")
+
+    if settings.settings["write_ke"]:
+        string = extend_str("<ke>",col)
+        string1 = write_columns(["xx","xy","xz"],col_num)
+        string2 = write_columns(["yx","yy","yz"],col_num)
+        string3 = write_columns(["zx","zy","zz"],col_num)
+        unit = energy_unit
+        file.write(f"{string}{string1}{unit}\n")
+        file.write(f"{string}{string2}{unit}\n")
+        file.write(f"{string}{string3}{unit}\n")
+
+    file.write("\n")
+    file.write("end HEADER\n\n")
+
+def write_summary(file,settings,data):
+    length_unit = settings.output_units["length"][0]
+    energy_unit = settings.output_units["energy"][0]
+    elements = set()
+    for atom in data["atoms"]:
+        elements.add(atom.split()[0])
+    elements = list(elements)
+    #print(elements)
+    file.write("begin SUMMARY\n\n")
+    for elem in elements:
+        string = ""
+        string += write_columns(["<atom>",elem],col)
+        string += "\n"
+        file.write(string)
+        if settings.settings["write_ke"]:
+            ke_tensor = np.zeros((3,3),dtype=float)*data["ke"].units
+            for i in range(len(data["atoms"])):
+                if data["atoms"][i].split()[0] == elem:
+                    ke_tensor += data["ke"][i]
+            for vec in ke_tensor:
+                string = extend_str("<ke>",col)
+                #unit = settings.output_unit["energy"][0]
+                str_vec = vec_to_string(vec.to(energy_unit))
+                string += write_columns(str_vec,col_num)
+                file.write(f"{string}\n")
+        file.write("\n")
+    file.write("end SUMMARY\n\n")
+
+def write_out(seed,settings,data,dryrun):
+    length_unit = settings.output_units["length"][0]
+    energy_unit = settings.output_units["energy"][0]
+    keys = list(settings.settings.keys())
+    keys.sort()
+    with open(f"{seed}.out","w") as file:
+        write_header(file,keys,settings)
+        if not dryrun:
+            if settings.settings["element_summary"]:
+                write_summary(file,settings,data)
+            for i in range(len(data["atoms"])):
+                string = extend_str("<atom>",col)
+                string += extend_str(data["atoms"][i],col)
+                file.write(f"{string}\n")
+
+                if data["r_eq"] is not None:
+                    string = extend_str("<r_eq>",col)
+                    
+                    r_eq = vec_to_string(data["r_eq"][i].to(length_unit))
+                    string += write_columns(r_eq,col_num)
+                    file.write(f"{string}\n")
+
+                if settings.settings["write_adp"]:
+                    for vec in data["adp"][i]:
+                        string = extend_str("<adp>",col)
+                        str_vec = vec_to_string(vec.to(length_unit))
+                        string += write_columns(str_vec,col_num)
+                        file.write(f"{string}\n")
+
+                if settings.settings["write_uij"]:
+                    for vec in data["uij"][i]:
+                        string = extend_str("<uij>",col)
+                        str_vec = vec_to_string(vec.to(length_unit**2))
+                        string += write_columns(str_vec,col_num)
+                        file.write(f"{string}\n")
+
+                if settings.settings["write_ke"]:
+                    for vec in data["ke"][i]:
+                        string = extend_str("<ke>",col)
+                        str_vec = vec_to_string(vec.to(energy_unit))
+                        string += write_columns(str_vec,col_num)
+                        file.write(f"{string}\n")
+
+                file.write("\n")

@@ -14,3 +14,5 @@ plot.py
 !example.adp
 *.dat
 *.out
+castep-adp-old.py
+*.f90

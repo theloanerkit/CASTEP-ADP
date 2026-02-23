@@ -1,9 +1,9 @@
 # CASTEP-ADP tool
-```.adp``` input file should have filename ```<seed>.adp```, this should contain paramters detailed below
+```.adp``` input file should have filename ```<seed>.adp``` (where the ```.md``` and ```.cell``` files are of the form ```<seed>.md``` and ```<seed>.cell```), this should contain paramters detailed below
 
-to run the tool in command line: ```python3 castep-adp.py -s <seed>```
+to run the tool in command line: ```python3 castep-adp.py <seed>```
 
-there is an optional ```--dryrun``` flag: ```python3 castep-adp.py -s <seed> --dryrun``` which will just read and check ```<seed>.adp``` for inputs and write out the header to the ```<seed>.out``` file
+there is an optional ```--dryrun``` flag: ```python3 castep-adp.py <seed> --dryrun``` which will just read and check ```<seed>.adp``` for inputs and write out the header to the ```<seed>.out``` file
 
 ## input file parameters
 ```calculate_adp```: calculate the atomic displacement paramters, default value = True (cannot be false if ```write_jmol``` is set to True)
@@ -20,6 +20,8 @@ there is an optional ```--dryrun``` flag: ```python3 castep-adp.py -s <seed> --d
 ```write_adp```: writes 3 orthogonal vectors for the atomic displacement parameter, default value = False
 
 ```write_ke```: writes the kinetic energy tensor $T_{ij} = \frac{m}{2}\langle v_iv_j\rangle$, default value = True if ```calculate_ke``` is True, otherwise False
+
+```write_ke_vectors```: writes the eigenvectors from the kinetic energy tensor, default value = False
 
 ```write_jmol```: writes a jmol script (.spt) file to display the atomic displacement parameter ellipsoids in jmol, default value = False
 
