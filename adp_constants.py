@@ -1,4 +1,9 @@
+import pint
+
 VERSION = "1.0.0"
+
+# for handling units
+ureg = pint.UnitRegistry()
 
 masses = {"H":  1.00794,
           "He": 4.0026,

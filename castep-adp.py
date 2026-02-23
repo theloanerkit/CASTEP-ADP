@@ -10,9 +10,6 @@ import adp_err
 import adp_io
 import adp_parse
 
-# for handling units
-ureg = pint.UnitRegistry()
-
 # for parsing command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("seed",
@@ -23,7 +20,7 @@ parser.add_argument("-d","--dryrun",
 # set up dictionary with masses of elements
 masses = {}
 for key in adp_constants.masses.keys():
-    masses[key] = adp_constants.masses[key] * ureg.unified_atomic_mass_unit
+    masses[key] = adp_constants.masses[key] * adp_constants.ureg.unified_atomic_mass_unit
 
 def calc_r_eq_from_md(md):
     # initialise array
@@ -38,7 +35,7 @@ def calc_r_eq_from_md(md):
     return r_eq
 
 def reorder_positions(positions,atoms):
-    ordered_pos = np.zeros((len(atoms),3),dtype=float)*ureg.angstrom
+    ordered_pos = np.zeros((len(atoms),3),dtype=float)*adp_constants.ureg.angstrom
     for i in range(len(atoms)):
         ordered_pos[i] += positions[atoms[i]]
     return ordered_pos
@@ -93,7 +90,7 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     print("loading settings")
-    settings = adp_settings.Settings(args.seed,ureg)
+    settings = adp_settings.Settings(args.seed)
 
     data = {"atoms":None,
             "r_eq" :None,
@@ -106,14 +103,14 @@ if __name__=="__main__":
             adp_err.file_not_found(args.seed,".md")
 
         print("parsing md file")
-        md_obj = adp_parse.parse_md(args.seed,settings.settings["equilibration_timesteps"],ureg)
+        md_obj = adp_parse.parse_md(args.seed,settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
 
         if settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
                 adp_err.file_not_found(args.seed,".cell")
-            cell_obj = adp_parse.parse_cell(args.seed,ureg)
+            cell_obj = adp_parse.parse_cell(args.seed)
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
 
         elif settings.settings["r_equilibrium"] == "finite":
