@@ -1,3 +1,5 @@
+[![Run tests](https://github.com/theloanerkit/CASTEP-ADP/actions/workflows/run_tests.yml/badge.svg)](https://github.com/theloanerkit/CASTEP-ADP/actions/workflows/run_tests.yml)
+
 # CASTEP-ADP tool
 ```.adp``` input file should have filename ```<seed>.adp``` (where the ```.md``` and ```.cell``` files are of the form ```<seed>.md``` and ```<seed>.cell```), this should contain paramters detailed below
 
