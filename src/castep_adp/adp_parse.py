@@ -1,7 +1,7 @@
 import re
 import numpy as np
-import adp_obj
-import adp_constants
+from . import adp_obj
+from . import adp_constants
 
 def parse_md(seed,equ_timesteps):
     # load md file

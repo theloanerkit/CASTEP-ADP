@@ -4,12 +4,12 @@ import numpy as np
 import scipy.linalg as sp
 import os
 # -----------------
-import adp_constants
-import adp_settings
-import adp_err
-import adp_io
-import adp_parse
-import adp_obj
+from . import adp_constants
+from . import adp_settings
+from . import adp_err
+from . import adp_io
+from . import adp_parse
+from . import adp_obj
 
 # set up dictionary with masses of elements -> move to constants
 masses = {}

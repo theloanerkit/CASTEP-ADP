@@ -1,6 +1,6 @@
 import numpy as np
-import adp_err
-import adp_constants
+from . import adp_err
+from . import adp_constants
 
 class MD:
     def __init__(self,timesteps,atoms,positions,velocities):
