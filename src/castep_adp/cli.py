@@ -186,7 +186,6 @@ def get_map(one,two):
   return m
 
 def get_parser() -> argparse.ArgumentParser:
-    # for parsing command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("seed",
                         help="seedname for the files (.md/.phonon/.cell/.adp)")
