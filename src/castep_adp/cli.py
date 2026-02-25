@@ -4,19 +4,12 @@ import numpy as np
 import scipy.linalg as sp
 import os
 # -----------------
-import adp_constants
-import adp_settings
-import adp_err
-import adp_io
-import adp_parse
-import adp_obj
-
-# for parsing command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("seed",
-                    help="seedname for the files (.md/.phonon/.cell/.adp)")
-parser.add_argument("-d","--dryrun",
-                    action="store_true")
+from . import adp_constants
+from . import adp_settings
+from . import adp_err
+from . import adp_io
+from . import adp_parse
+from . import adp_obj
 
 # set up dictionary with masses of elements -> move to constants
 masses = {}
@@ -192,8 +185,17 @@ def get_map(one,two):
     m[one[i]] = two[i]
   return m
 
-if __name__=="__main__":
-    args = parser.parse_args()
+def get_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("seed",
+                        help="seedname for the files (.md/.phonon/.cell/.adp)")
+    parser.add_argument("-d","--dryrun",
+                        action="store_true")
+    return parser
+
+
+def main() -> None:
+    args = get_parser().parse_args()
 
     print("loading settings")
     settings = adp_settings.Settings(args.seed)
@@ -298,3 +300,6 @@ if __name__=="__main__":
                   file.write(f"{atom.name}  ")
                 file.write("\n")
 
+
+if __name__=="__main__":
+    main()

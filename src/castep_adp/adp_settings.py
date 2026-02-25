@@ -1,6 +1,6 @@
-import adp_err
-import adp_constants
-import adp_obj
+from . import adp_err
+from . import adp_constants
+from . import adp_obj
 
 def check_int(obj,key,ubound=None,lbound=None):
     # check if parameter is an integer

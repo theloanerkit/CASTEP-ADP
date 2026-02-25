@@ -10,7 +10,7 @@ plot.py
 *.txt
 !README.md
 *.adp
-/__pycache__
+**/__pycache__
 !example.adp
 *.dat
 *.out
