@@ -1,24 +1,28 @@
 import adp_err
 import adp_constants
+import adp_obj
 
 def check_int(obj,key,ubound=None,lbound=None):
-    if not obj.valid:
+    # check if parameter is an integer
+    # optionally check if parameter value is within set bounds
+    if not obj.valid:   # something else has gone wrong
         return
-    try:
+    try:                # try and cast to an int
         obj.settings[key] = int(obj.settings[key])
     except:
         obj.valid = False
         adp_err.invalid_parameter(key,obj.settings[key],"integer")
 
-    if lbound is not None and obj.settings[key] < lbound:
+    if lbound is not None and obj.settings[key] < lbound:   # check lower bound
         obj.valid = False
         adp_err.invalid_parameter(key,obj.settings[key],lbound=lbound)
     
-    if ubound is not None and obj.settings[key] > ubound:
+    if ubound is not None and obj.settings[key] > ubound:   # check upper bound
         obj.valid = False
         adp_err.invalid_parameter(key,obj.settings[key],ubound=ubound)
 
 def check_boolean(obj,key):
+    # check if parameter is a boolean
     if obj.valid and obj.settings[key] in ["t","true",True]:
         obj.settings[key] = True
     elif obj.valid and obj.settings[key] in ["f","false",False]:
@@ -28,6 +32,7 @@ def check_boolean(obj,key):
         adp_err.invalid_parameter(key,obj.settings[key])
     
 def check_keywords(obj,key,keywords,map=None):
+    # check if parameter is within a set of keywords
     if obj.valid and obj.settings[key] not in keywords:
         obj.valid = False
         adp_err.invalid_parameter(key,obj.settings[key],optns=keywords)
@@ -35,29 +40,81 @@ def check_keywords(obj,key,keywords,map=None):
         if obj.settings[key] in map.keys():
             obj.settings[key] = map[obj.settings[key]]
 
+def check_string_arr(obj,key,keywords=None):
+    if obj.valid and keywords is None:
+        obj.settings[key] = obj.settings[key].strip().split()
+    elif obj.valid and keywords is not None:
+        for val in obj.settings[key]:
+            if val not in keywords:
+                obj.valid = False
+                # adp_err
+    else:
+        obj.valid = False
+
+def check_float_unit(obj,key,units):
+    # do this properly later
+    units_dict = {"angstrom"     :[adp_constants.ureg.angstrom,"angstrom"],
+                 "ang"          :[adp_constants.ureg.angstrom,"angstrom"],
+                 "bohr"         :[adp_constants.ureg.bohr,"bohr"],
+                 "nanometer"    :[adp_constants.ureg.nanometer,"nm"],
+                 "nm"           :[adp_constants.ureg.nanometer,"nm"],
+                 "atomic_length":[adp_constants.ureg.bohr,"bohr"],
+                 "electron_volt":[adp_constants.ureg.electron_volt,"electron-volt"],
+                 "electron-volt":[adp_constants.ureg.electron_volt,"electron-volt"],
+                 "ev"           :[adp_constants.ureg.electron_volt,"electron-volt"],
+                 "hartree"      :[adp_constants.ureg.hartree,"hartree"],
+                 "ha"           :[adp_constants.ureg.hartree,"hartree"],
+                 "atomic_energy":[adp_constants.ureg.hartree,"hartree"],
+                 "joule"        :[adp_constants.ureg.joule,"joule"],
+                 "j"            :[adp_constants.ureg.joule,"joule"]}
+    if not obj.valid:
+        return
+    else:
+        try:
+            val = float(obj.settings[key].split()[0])
+        except:
+            obj.valid = False
+            adp_err.invalid_parameter(key,obj.settings[key],"float")
+
+    u = obj.settings[key].split()[1]
+    if u not in units:
+        obj.valid = False
+        # break with appropriate error here
+    if u != "percent":
+        u = units_dict[u]
+    else:
+        val = val/100
+    obj.settings[key] = adp_obj.Tolerance(val,u)
+        
+    
+    
+
 # first item in list is default value
 # all further items are check functions to be called on user input
 # and kwargs for those check functions
 parameters = {
-    "equilibration_timesteps":[0,[check_int,{"lbound":0}]],
-    "calculate_adp"          :[True,[check_boolean,{}]],
-    "write_adp"              :[True,[check_boolean,{}]],
-    "r_equilibrium"          :["finite",
-                               [check_keywords,{"keywords":["finite","zero"]}]],
-    "write_uij"              :[False,[check_boolean,{}]],
-    "calculate_ke"           :[False,[check_boolean,{}]],
-    "write_ke"               :[False,[check_boolean,{}]],
-    "element_summary"        :[False,[check_boolean,{}]],
-    "output_length"          :["angstrom",
-                               [check_keywords,
-                                {"keywords":["angstrom","ang","bohr","nanometer","nm","atomic"],
-                                 "map":{"atomic":"atomic_length"}}]],
-    "output_energy"          :["electron_volt",
-                               [check_keywords,
-                                {"keywords":["electron_volt","electron-volt","ev","hartree","ha","joule","j","atomic"],
-                                 "map":{"atomic":"atomic_energy"}}]],
-    "write_jmol"             :[False,[check_boolean,{}]],
-    "jmol_scale"             :[5,[check_int,{"lbound":0}]]
+  "equilibration_timesteps"   :[0,[check_int,{"lbound":0}]],
+  "calculate_adp"             :[True,[check_boolean,{}]],
+  "write_adp"                 :[True,[check_boolean,{}]],
+  "r_equilibrium"             :["finite",
+                                [check_keywords,{"keywords":["finite","zero"]}]],
+  "write_uij"                 :[False,[check_boolean,{}]],
+  "calculate_ke"              :[False,[check_boolean,{}]],
+  "write_ke"                  :[False,[check_boolean,{}]],
+  "element_summary"           :[False,[check_boolean,{}]],
+  "output_length"             :["angstrom",
+                                [check_keywords,
+                                 {"keywords":["angstrom","ang","bohr","nanometer","nm","atomic"],
+                                  "map":{"atomic":"atomic_length"}}]],
+  "output_energy"             :["electron_volt",
+                                [check_keywords,
+                                 {"keywords":["electron_volt","electron-volt","ev","hartree","ha","joule","j","atomic"],
+                                  "map":{"atomic":"atomic_energy"}}]],
+  "write_jmol"                :[False,[check_boolean,{}]],
+  "jmol_scale"                :[5,[check_int,{"lbound":0}]],
+  "detect_environment"        :[None,[check_string_arr,{}]],
+  "environment_tolerance_adp" :[None,[check_float_unit,{"units":["percent","angstrom"]}]],
+  "environment_tolerance_ke"  :[None,[check_float_unit,{"units":["percent","electron-volt"]}]]
 }
 
 class Settings:

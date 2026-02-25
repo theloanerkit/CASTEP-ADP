@@ -93,3 +93,68 @@ class Cell:
             pos = np.asarray(line[1:4],dtype=float)
             positions[name] = pos
         self.positions_frac = positions
+
+class Tolerance:
+    def __init__(self,value,unit):
+        self.value = value
+        self.unit = unit
+
+    def within_tolerance(self,val1,val2):
+        if self.unit == "percent":
+            tol = self.value*val1
+        else:
+            tol = self.value*self.unit
+
+        val1 = val1.to(tol.units)
+        val2 = val2.to(tol.units)
+        #print(val1,val2)
+        if abs(val2-val1) < tol:
+            return True
+        else:
+            return False
+        
+class Atom:
+    def __init__(self,name):
+        self.name = name
+        self.r_eq = None    # equilibrium positions
+        self.adp = None     # vectors defining atomic displacement parameter
+        self.uij = None     # ADP tensor
+        self.ke = None      # KE tensor
+
+        self.ke_vecs = None # vectors defining ke tensor
+        self.adp_magnitudes,self.adp_sort = None,None#self.get_sorted_magnitudes()
+        self.ke_magnitudes,self.ke_sort = None,None
+        self.adp_ke_map = None
+
+    def calc_magnitudes(self,adp,ke):
+        if adp is not None:
+            self.adp_magnitudes, self.adp_sort = self.get_sorted_magnitudes(self.adp)
+        if ke is not None:
+            self.ke_magnitudes, self.ke_sort = self.get_sorted_magnitudes(self.ke_vecs)
+        if adp is not None and ke is not None:
+            m = {0:-1,1:-1,2:-1}
+            for i in range(3):
+                m[self.adp_sort[i]] = self.ke_sort[i]
+            self.adp_ke_map = m
+
+    def get_sorted_magnitudes(self,vecs):
+        magnitudes = []
+        for j in range(len(vecs)):
+            magnitudes.append(np.linalg.norm(vecs[j].magnitude))
+        idxs = np.argsort(magnitudes)
+        magnitudes = magnitudes*vecs.units
+        return magnitudes[idxs], idxs
+        
+class Atom_Environment:
+    def __init__(self,label,adp):
+        self.name = label
+        self.adp = adp
+        self.magnitudes, self.sort_arr = self.get_sorted_magnitudes()
+
+    def get_sorted_magnitudes(self):
+        magnitudes = []
+        for j in range(len(self.adp)):
+            magnitudes.append(np.linalg.norm(self.adp[j].magnitude))
+        idxs = np.argsort(magnitudes)
+        magnitudes = magnitudes*self.adp.units
+        return magnitudes[idxs], idxs
