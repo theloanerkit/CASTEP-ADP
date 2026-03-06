@@ -1,20 +1,20 @@
 import argparse
-import pint
+#import pint
 import numpy as np
-import scipy.linalg as sp
+#import scipy.linalg as sp
 import os
 # -----------------
 from . import adp_constants
-from . import adp_settings
+from . import settings
 from . import adp_err
 from . import adp_io
 from . import adp_parse
 from . import adp_obj
 
 # set up dictionary with masses of elements -> move to constants
-masses = {}
-for key in adp_constants.masses.keys():
-    masses[key] = adp_constants.masses[key] * adp_constants.ureg.unified_atomic_mass_unit
+#masses = {}
+#for key in adp_constants.masses.keys():
+#    masses[key] = adp_constants.masses[key] * adp_constants.ureg.unified_atomic_mass_unit
 
 def calc_r_eq_from_md(md):
   # initialise array
@@ -22,13 +22,16 @@ def calc_r_eq_from_md(md):
 
   # add up all positions
   for timestep in md.positions:
+    #print(timestep)
     r_eq += timestep
+    #print(r_eq)
 
   # average over timesteps
   r_eq /= md.timesteps
   return r_eq
 
 def reorder_positions(positions,atoms):
+  # make sure positions are in the same order as castep outputs in the .md file
   ordered_pos = np.zeros((len(atoms),3),dtype=float)*adp_constants.ureg.angstrom
   for i in range(len(atoms)):
     ordered_pos[i] += positions[atoms[i]]
@@ -50,7 +53,7 @@ def calc_covariance_matrix(md,r_eq):
 def calc_ke_tensor(md):
   # initialise array
   v_tensor = np.zeros((len(md.atoms),3,3))*(md.velocities[0,0,0].units**2)
-  ke_tensor = np.zeros(np.shape(v_tensor))*(v_tensor[0,0,0].units*masses["H"].units)
+  ke_tensor = np.zeros(np.shape(v_tensor))*(v_tensor[0,0,0].units*adp_constants.masses["H"].units)
 
   # add up |v><v| matrices
   for timestep in md.velocities:
@@ -61,7 +64,7 @@ def calc_ke_tensor(md):
 
   # calculate ke tensor
   for i in range(len(md.atoms)):
-    ke_tensor[i,:,:] = v_tensor[i,:,:] * 0.5 * masses[md.atoms[i].split()[0]]
+    ke_tensor[i,:,:] = v_tensor[i,:,:] * 0.5 * adp_constants.masses[md.atoms[i].split()[0]]
   return ke_tensor
 
 def evals_evecs(matrix,atoms,sqrt=False):
@@ -168,15 +171,15 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
         env.add(atom)
         environments.append(env)
     #input("next")
-  for env in environments:
-    print("environment: ")
-    for atom in env:
-      #m = get_map(atom.adp_sort,atom.ke_sort)
-      #s = ""
-      #for k in m.keys():
+  #for env in environments:
+  #  print("environment: ")
+  #  for atom in env:
+  #    m = get_map(atom.adp_sort,atom.ke_sort)
+  #    #s = ""
+  #    for k in m.keys():
       #   s += f"{k} -> {m[k]}    "
-      print(f"    atom: {atom.name}    {atom.adp_sort}, {atom.ke_sort}")
-      print(f"        : {atom.adp_magnitudes}    {atom.ke_magnitudes}")
+      #print(f"    atom: {atom.name}    {atom.adp_sort}, {atom.ke_sort}")
+      #print(f"        : {atom.adp_magnitudes}    {atom.ke_magnitudes}")
   return environments
   
 def get_map(one,two):
@@ -198,7 +201,7 @@ def main() -> None:
     args = get_parser().parse_args()
 
     print("loading settings")
-    settings = adp_settings.Settings(args.seed)
+    settings = settings.Settings(args.seed)
 
     data = {"atoms":None,
             "r_eq" :None,
@@ -220,7 +223,7 @@ def main() -> None:
         keys = list(atoms.keys())
 
         if settings.settings["detect_environment"] is not None:
-            adp_settings.check_string_arr(settings,"detect_environment",md_obj.atoms)
+            settings.check_string_arr(settings,"detect_environment",md_obj.atoms)
 
         if settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
