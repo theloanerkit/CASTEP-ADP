@@ -12,7 +12,9 @@ plot.py
 *.adp
 **/__pycache__
 !example.adp
+!tests/data/*.adp
 *.dat
 *.out
 castep-adp-old.py
 *.f90
+*.sh

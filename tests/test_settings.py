@@ -1,5 +1,16 @@
 from castep_adp import settings,adp_constants
 
+def check_dict(s,dict):
+  errors = 0
+  errmsg = ""
+  for key in dict.keys():
+    if s[key] != dict[key]:
+      if errors == 0:
+        errmsg += "Error(s) occured:\n"
+      errors += 1
+      errmsg += f"  setting {key} given default {s[key]}, intended default {dict[key]}"
+  return errors, errmsg
+
 def test_default_settings():
   params_dict = {
     "equilibration_timesteps"  : 0,
@@ -19,14 +30,7 @@ def test_default_settings():
     "environment_tolerance_ke" : None
   }
   s = settings.Settings("tests/data/test_default")
-  errors = 0
-  errmsg = ""
-  for key in params_dict.keys():
-    if s.settings[key] != params_dict[key]:
-      if errors == 0:
-        errmsg += "Error(s) occured:\n"
-      errors += 1
-      errmsg += f"  setting {key} given default {s.settings[key]}, intended default {params_dict[key]}"
+  errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
 def test_adp_settings_1():
@@ -39,8 +43,6 @@ def test_adp_settings_1():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -48,14 +50,7 @@ def test_adp_settings_1():
     "environment_tolerance_ke" : None
   }
   s = settings.Settings("tests/data/test_adp_1")
-  errors = 0
-  errmsg = ""
-  for key in params_dict.keys():
-    if s.settings[key] != params_dict[key]:
-      if errors == 0:
-        errmsg += "Error(s) occured:\n"
-      errors += 1
-      errmsg += f"  setting {key} given default {s.settings[key]}, intended default {params_dict[key]}"
+  errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
 def test_adp_settings_2():
@@ -68,8 +63,6 @@ def test_adp_settings_2():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -77,14 +70,7 @@ def test_adp_settings_2():
     "environment_tolerance_ke" : None
   }
   s = settings.Settings("tests/data/test_adp_2")
-  errors = 0
-  errmsg = ""
-  for key in params_dict.keys():
-    if s.settings[key] != params_dict[key]:
-      if errors == 0:
-        errmsg += "Error(s) occured:\n"
-      errors += 1
-      errmsg += f"  setting {key} given default {s.settings[key]}, intended default {params_dict[key]}"
+  errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
 def test_ke_settings_1():
@@ -97,8 +83,6 @@ def test_ke_settings_1():
     "calculate_ke"             : True,
     "write_ke"                 : True,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -106,12 +90,77 @@ def test_ke_settings_1():
     "environment_tolerance_ke" : None
   }
   s = settings.Settings("tests/data/test_ke_1")
-  errors = 0
-  errmsg = ""
-  for key in params_dict.keys():
-    if s.settings[key] != params_dict[key]:
-      if errors == 0:
-        errmsg += "Error(s) occured:\n"
-      errors += 1
-      errmsg += f"  setting {key} given default {s.settings[key]}, intended default {params_dict[key]}"
+  errors, errmsg = check_dict(s.settings,params_dict)
+  assert errors==0, errmsg
+
+def test_length_unit_angstrom():
+  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
+                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  s1 = settings.Settings("tests/data/test_angstrom_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_angstrom_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
+  assert errors==0, errmsg
+
+def test_length_unit_bohr():
+  output_units = {"length":[adp_constants.ureg.bohr,"bohr"],
+                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  s1 = settings.Settings("tests/data/test_bohr_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_bohr_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
+  assert errors==0, errmsg
+  s3 = settings.Settings("tests/data/test_bohr_3")
+  errors, errmsg = check_dict(s3.output_units,output_units)
+  assert errors==0, errmsg
+
+def test_length_unit_nanometer():
+  output_units = {"length":[adp_constants.ureg.nanometer,"nm"],
+                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  s1 = settings.Settings("tests/data/test_nanometer_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_nanometer_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
+  assert errors==0, errmsg
+
+def test_energy_unit_electron_volt():
+  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
+                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  s1 = settings.Settings("tests/data/test_electron_volt_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_electron_volt_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
+  assert errors==0, errmsg
+  s3 = settings.Settings("tests/data/test_electron_volt_3")
+  errors, errmsg = check_dict(s3.output_units,output_units)
+  assert errors==0, errmsg
+
+def test_energy_unit_hartree():
+  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
+                  "energy":[adp_constants.ureg.hartree,"hartree"]}
+  s1 = settings.Settings("tests/data/test_hartree_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_hartree_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
+  assert errors==0, errmsg
+  s3 = settings.Settings("tests/data/test_hartree_3")
+  errors, errmsg = check_dict(s3.output_units,output_units)
+  assert errors==0, errmsg
+  s4 = settings.Settings("tests/data/test_hartree_4")
+  errors, errmsg = check_dict(s4.output_units,output_units)
+  assert errors==0, errmsg
+
+def test_energy_unit_hartree():
+  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
+                  "energy":[adp_constants.ureg.joule,"joule"]}
+  s1 = settings.Settings("tests/data/test_joule_1")
+  errors, errmsg = check_dict(s1.output_units,output_units)
+  assert errors==0, errmsg
+  s2 = settings.Settings("tests/data/test_joule_2")
+  errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
