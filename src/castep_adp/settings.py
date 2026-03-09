@@ -38,13 +38,13 @@ def check_boolean(obj,key):
     raise err.InvalidParamter(key,obj.settings[key])
     
 def check_keywords(obj,key,keywords,map=None):
-    # check if parameter is within a set of keywords
-    if obj.valid and obj.settings[key] not in keywords:
-        obj.valid = False
-        err.invalid_parameter(key,obj.settings[key],optns=keywords)
-    if map is not None:
-        if obj.settings[key] in map.keys():
-            obj.settings[key] = map[obj.settings[key]]
+  # check if parameter is within a set of keywords
+  if obj.valid and obj.settings[key] not in keywords:
+    obj.valid = False
+    raise err.InvalidParamter(key,obj.settings[key],optns=keywords)
+  if map is not None:
+    if obj.settings[key] in map.keys():
+      obj.settings[key] = map[obj.settings[key]]
 
 def check_string_arr(obj,key,keywords=None):
     if obj.valid and keywords is None:
