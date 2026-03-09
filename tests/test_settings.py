@@ -1,4 +1,5 @@
-from castep_adp import settings,adp_constants
+import pytest
+from castep_adp import settings,adp_constants,err
 
 def check_dict(s,dict):
   errors = 0
@@ -164,3 +165,31 @@ def test_energy_unit_hartree():
   s2 = settings.Settings("tests/data/test_joule_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
+
+def test_eq_timesteps():
+  params_dict = {
+    "equilibration_timesteps"  : 100,
+    "calculate_adp"            : True,
+    "write_adp"                : True,
+    "r_equilibrium"            : "finite",
+    "write_uij"                : False,
+    "calculate_ke"             : False,
+    "write_ke"                 : False,
+    "element_summary"          : False,
+    "output_length"            : adp_constants.ureg.angstrom,
+    "output_energy"            : adp_constants.ureg.electron_volt,
+    "write_jmol"               : False,
+    "jmol_scale"               : 5,
+    "detect_environment"       : None,
+    "environment_tolerance_adp": None,
+    "environment_tolerance_ke" : None
+  }
+  s1 = settings.Settings("tests/data/test_eq_ts_1")
+  errors, errmsg = check_dict(s1.settings,params_dict)
+  assert errors==0, errmsg
+  with pytest.raises(err.InvalidParamter):
+    s2 = settings.Settings("tests/data/test_eq_ts_2")
+  with pytest.raises(err.InvalidParamter):
+    s3 = settings.Settings("tests/data/test_eq_ts_3")
+  with pytest.raises(err.InvalidParamter):
+    s4 = settings.Settings("tests/data/test_eq_ts_4")

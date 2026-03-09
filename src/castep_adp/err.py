@@ -1,3 +1,5 @@
+import sys
+
 def no_lattice_cart():
   string = f"No lattice_cart block in cell file\n"
   string += "Reading atomic positions from a cell file requires lattice_cart block"
@@ -40,3 +42,33 @@ def invalid_parameter(key,value,optns=None,kind=None,lbound=None,ubound=None):
     string += f"{key} must be a{n} {kind}, got {value} instead"
   print(string)
   quit()
+
+class InvalidParamter(Exception):
+  def __init__(self,key,value,optns=None,kind=None,lbound=None,ubound=None):
+    self.key = key
+    self.value = value
+    self.optns = optns
+    self.kind = kind
+    self.lbound = lbound
+    self.ubound = ubound
+    self.__suppress_context__=True
+    sys.tracebacklimit=0
+
+  def __str__(self):
+    msg = ""
+    if self.kind is None and self.lbound is None and self.ubound is None:
+      msg += f"Unexpected value {self.value} for {self.key}, expected "
+      if self.optns is None:
+        string += "true or false"
+      else:
+        substr = "/".join(self.optns)
+        string += f"one of {substr}"
+    elif self.lbound is not None:
+      msg += f"Unexpected value {self.value} for {self.key}, {self.key} >= {self.lbound}"
+    elif self.ubound is not None:
+      msg += f"Unexpected value {self.value} for {self.key}, {self.key} <= {self.ubound}"
+    else:
+      n = ""
+      if self.kind[0] in ["a","e","i","o","u"]: n = "n"
+      msg += f"{self.key} must be a{n} {self.kind}, got {self.value} instead"
+    return msg

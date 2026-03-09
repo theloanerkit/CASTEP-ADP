@@ -6,7 +6,7 @@ import os
 # -----------------
 from . import adp_constants
 from . import settings
-from . import adp_err
+from . import err
 from . import adp_io
 from . import adp_parse
 from . import adp_obj
@@ -201,7 +201,7 @@ def main() -> None:
     args = get_parser().parse_args()
 
     print("loading settings")
-    settings = settings.Settings(args.seed)
+    user_settings = settings.Settings(args.seed)
 
     data = {"atoms":None,
             "r_eq" :None,
@@ -213,35 +213,35 @@ def main() -> None:
 
     if not args.dryrun:
         if not os.path.isfile(f"{args.seed}.md"):
-            adp_err.file_not_found(args.seed,".md")
+            err.file_not_found(args.seed,".md")
 
         print("parsing md file")
-        md_obj = adp_parse.parse_md(args.seed,settings.settings["equilibration_timesteps"])
+        md_obj = adp_parse.parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
             atoms[label] = adp_obj.Atom(label)
         keys = list(atoms.keys())
 
-        if settings.settings["detect_environment"] is not None:
-            settings.check_string_arr(settings,"detect_environment",md_obj.atoms)
+        if user_settings.settings["detect_environment"] is not None:
+            user_settings.check_string_arr(user_settings,"detect_environment",md_obj.atoms)
 
-        if settings.settings["r_equilibrium"] == "zero":
+        if user_settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
-                adp_err.file_not_found(args.seed,".cell")
+                err.file_not_found(args.seed,".cell")
             cell_obj = adp_parse.parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
 
-        elif settings.settings["r_equilibrium"] == "finite":
+        elif user_settings.settings["r_equilibrium"] == "finite":
             print("calculating r_eq")
             r_eq = calc_r_eq_from_md(md_obj)
             data["r_eq"] = r_eq
             for i in range(len(keys)):
                 atoms[keys[i]].r_eq = r_eq[i]
 
-        if settings.settings["calculate_adp"]:
+        if user_settings.settings["calculate_adp"]:
             print("calculating covariance matrix")
             cov_mat = calc_covariance_matrix(md_obj,data["r_eq"])
             data["uij"] = cov_mat
@@ -258,7 +258,7 @@ def main() -> None:
 
         
 
-        if settings.settings["calculate_ke"]:
+        if user_settings.settings["calculate_ke"]:
             print("calculating ke")
             ke = calc_ke_tensor(md_obj)
             data["ke"] = ke
@@ -270,31 +270,31 @@ def main() -> None:
                 atoms[keys[i]].ke_vecs = axes[i]
 
         environments = None
-        if settings.settings["detect_environment"] is not None:
+        if user_settings.settings["detect_environment"] is not None:
             print("searching for chemical environments")
             for atom in settings.settings["detect_environment"]:
-                environments = detect_environments(atom,atoms,settings.settings["environment_tolerance_adp"],settings.settings["environment_tolerance_ke"])
+                environments = detect_environments(atom,atoms,user_settings.settings["environment_tolerance_adp"],settings.settings["environment_tolerance_ke"])
 
         
 
     print("writing")
-    adp_io.write_out(args.seed,settings,atoms,args.dryrun)
+    adp_io.write_out(args.seed,user_settings,atoms,args.dryrun)
     if not args.dryrun:
-        if settings.settings["write_jmol"]:
+        if user_settings.settings["write_jmol"]:
             print("writing jmol")
             adp_io.write_jmol_script(args.seed,
                                      data["adp"].to("angstrom").magnitude,
                                      data["atoms"],
                                      data["r_eq"].to("angstrom").magnitude,
-                                     settings.settings["jmol_scale"])
-        if settings.settings["detect_environment"] is not None:
+                                     user_settings.settings["jmol_scale"])
+        if user_settings.settings["detect_environment"] is not None:
             print("writing environments jmol")
             print(f"{len(environments)} environments found")
             adp_io.write_jmol_script(args.seed,
                                      data["adp"].to("angstrom").magnitude,
                                      data["atoms"],
                                      data["r_eq"].to("angstrom").magnitude,
-                                     settings.settings["jmol_scale"],
+                                     user_settings.settings["jmol_scale"],
                                      environments)
             with open(f"{args.seed}_env.out","w") as file:
               for i in range(len(environments)):
