@@ -1,5 +1,5 @@
 import numpy as np
-from . import adp_err
+from . import err
 from . import adp_constants
 
 class MD:
@@ -46,7 +46,7 @@ class Cell:
         if "cart" in self.lattice[0].lower():
             self.construct_cart()
         elif "abc" in self.lattice[0].lower():
-            adp_err.no_lattice_cart()
+            err.no_lattice_cart()
         if "abs" in self.positions[0].lower():
             self.construct_abs()
         elif "frac" in self.positions[0].lower():
