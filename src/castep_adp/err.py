@@ -59,10 +59,10 @@ class InvalidParamter(Exception):
     if self.kind is None and self.lbound is None and self.ubound is None:
       msg += f"Unexpected value {self.value} for {self.key}, expected "
       if self.optns is None:
-        string += "true or false"
+        msg += "true or false"
       else:
         substr = "/".join(self.optns)
-        string += f"one of {substr}"
+        msg += f"one of {substr}"
     elif self.lbound is not None:
       msg += f"Unexpected value {self.value} for {self.key}, {self.key} >= {self.lbound}"
     elif self.ubound is not None:

@@ -193,3 +193,27 @@ def test_eq_timesteps():
     s3 = settings.Settings("tests/data/test_eq_ts_3")
   with pytest.raises(err.InvalidParamter):
     s4 = settings.Settings("tests/data/test_eq_ts_4")
+
+def test_write_jmol():
+  params_dict = {
+    "equilibration_timesteps"  : 0,
+    "calculate_adp"            : True,
+    "write_adp"                : False,
+    "r_equilibrium"            : "finite",
+    "write_uij"                : False,
+    "calculate_ke"             : False,
+    "write_ke"                 : False,
+    "element_summary"          : False,
+    "output_length"            : adp_constants.ureg.angstrom,
+    "output_energy"            : adp_constants.ureg.electron_volt,
+    "write_jmol"               : True,
+    "jmol_scale"               : 5,
+    "detect_environment"       : None,
+    "environment_tolerance_adp": None,
+    "environment_tolerance_ke" : None
+  }
+  s1 = settings.Settings("tests/data/test_write_jmol_1")
+  errors, errmsg = check_dict(s1.settings,params_dict)
+  assert errors==0, errmsg
+  with pytest.raises(err.InvalidParamter):
+    s2 = settings.Settings("tests/data/test_write_jmol_2")
