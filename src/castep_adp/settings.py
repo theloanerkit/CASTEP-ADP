@@ -26,6 +26,33 @@ def check_int(obj,key,ubound=None,lbound=None):
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
       raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
+  
+def check_float(obj,key,ubound=None,lbound=None):
+  # check if parameter is a float
+  # optionally check if parameter is within set bounds
+  if not obj.valid:    # something else has gone wrong
+     return
+  
+  # check if float
+  if obj.settings[key][0] in ("-","+"):
+    is_float = obj.settings[key][1:].replace(".","",1).isdigit()
+  elif obj.settings[key][0] == ".":
+    is_float = obj.settings[key][1:].isdigit()
+  else:
+    is_float = obj.settings[key].replace(".","",1).isdigit()
+
+  if not is_float:
+    raise err.InvalidParamter(key,obj.settings[key],kind="float")
+  else:
+    obj.settings[key] = float(obj.settings[key])
+
+  if lbound is not None and obj.settings[key] < lbound:   # check lower bound
+      obj.valid = False
+      raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
+  
+  if ubound is not None and obj.settings[key] > ubound:   # check upper bound
+      obj.valid = False
+      raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
 
 def check_boolean(obj,key):
   # check if parameter is a boolean
@@ -117,7 +144,7 @@ parameters = {
                                  {"keywords":["electron_volt","electron-volt","ev","hartree","ha","joule","j","atomic","atomic_energy"],
                                   "map":{"atomic":"atomic_energy"}}]],
   "write_jmol"                :[False,[check_boolean,{}]],
-  "jmol_scale"                :[5,[check_int,{"lbound":0}]],
+  "jmol_scale"                :[5,[check_float,{"lbound":0}]],
   "detect_environment"        :[None,[check_string_arr,{}]],
   "environment_tolerance_adp" :[None,[check_float_unit,{"units":["percent","angstrom"]}]],
   "environment_tolerance_ke"  :[None,[check_float_unit,{"units":["percent","electron-volt"]}]]
