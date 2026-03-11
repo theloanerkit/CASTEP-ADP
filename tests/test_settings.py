@@ -217,6 +217,19 @@ def test_write_jmol():
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
     s2 = settings.Settings("tests/data/test_write_jmol_2")
+  params_dict["jmol_scale"] = 10
+  s3 = settings.Settings("tests/data/test_write_jmol_3")
+  errors, errmsg = check_dict(s3.settings,params_dict)
+  params_dict["jmol_scale"] = 6.9
+  s4 = settings.Settings("tests/data/test_write_jmol_4")
+  errors, errmsg = check_dict(s4.settings,params_dict)
+  params_dict["jmol_scale"] = 0.1
+  s5 = settings.Settings("tests/data/test_write_jmol_5")
+  errors, errmsg = check_dict(s5.settings,params_dict)
+  with pytest.raises(err.InvalidParamter):
+    s6 = settings.Settings("tests/data/test_write_jmol_6")
+  with pytest.raises(err.InvalidParamter):
+    s7 = settings.Settings("tests/data/test_write_jmol_7")
 
 def test_r_equ():
   params_dict = {
