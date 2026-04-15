@@ -1,6 +1,6 @@
 from . import err
 from . import adp_constants
-from . import obj
+from .obj import Tolerance
 
 def check_int(obj,key,ubound=None,lbound=None):
   # check if parameter is an integer
@@ -102,7 +102,7 @@ def check_float_unit(obj,key,units):
         u = adp_constants.units_dict[u]
     else:
         val = val/100
-    obj.settings[key] = obj.Tolerance(val,u)
+    obj.settings[key] = Tolerance(val,u)  ## needs to be adp_obj
         
     
     
