@@ -43,6 +43,38 @@ def invalid_parameter(key,value,optns=None,kind=None,lbound=None,ubound=None):
   print(string)
   quit()
 
+class UnitError(Exception):
+  def __init__(self,kind,unit,dim=None,loc=None):
+    self.kind = kind
+    self.loc = loc
+    self.unit = unit
+    self.dim = dim
+    self.__suppress_context__=True
+    sys.tracebacklimit=0
+
+  def __str__(self):
+    msg = ""
+    if self.kind == "unknown unit":
+      msg += f"Unknown unit {self.unit} in {self.loc}"
+    if self.kind == "dimensionality":
+      msg += f"Inconsistent dimensionality in units: expected {self.dim}, got {self.unit} with dimensionality {self.unit.dimensionality}"
+    return msg
+
+class IncompatibleCell(Exception):
+  def __init__(self,kind):
+    self.kind = kind
+    self.__suppress_context__=True
+    sys.tracebacklimit=0
+
+  def __str__(self):
+    msg = ""
+    if self.kind == "no lattice cart":
+      msg += "No lattice_cart block in cell file\n"
+      msg += "Reading atomic positions from a cell file requires lattice_cart block"
+    if self.kind == "no positions block":
+      msg += "No positions block in cell file"
+    return msg
+
 class InvalidParamter(Exception):
   def __init__(self,key,value,optns=None,kind=None,lbound=None,ubound=None):
     self.key = key
@@ -71,4 +103,23 @@ class InvalidParamter(Exception):
       n = ""
       if self.kind[0] in ["a","e","i","o","u"]: n = "n"
       msg += f"{self.key} must be a{n} {self.kind}, got {self.value} instead"
+    return msg
+  
+class ParseMDError(Exception):
+  def __init__(self,kind,equ_timesteps=None):
+    self.kind = kind
+    self.equ_timesteps = equ_timesteps
+    self.__suppress_context__=True
+    sys.tracebacklimit=0
+
+  def __str__(self):
+    msg = "Error parsing MD file: "
+    if self.kind == "no timesteps":
+      msg += "no timesteps found\n"
+      if self.equ_timesteps is None:
+        msg += "  This is likely due to either an empty MD file, or the number of equilibration timesteps set too high"
+      elif self.equ_timesteps == 0:
+        msg += "  This is likely due to an empty MD file"
+      else:
+        msg += f"  This is likely due to the number of equilibration timesteps being set too high (equilibration timesteps set to {self.equ_timesteps})"
     return msg

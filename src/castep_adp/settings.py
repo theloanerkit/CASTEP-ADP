@@ -85,21 +85,6 @@ def check_string_arr(obj,key,keywords=None):
         obj.valid = False
 
 def check_float_unit(obj,key,units):
-    # do this properly later
-    units_dict = {"angstrom"     :[adp_constants.ureg.angstrom,"angstrom"],
-                 "ang"          :[adp_constants.ureg.angstrom,"angstrom"],
-                 "bohr"         :[adp_constants.ureg.bohr,"bohr"],
-                 "nanometer"    :[adp_constants.ureg.nanometer,"nm"],
-                 "nm"           :[adp_constants.ureg.nanometer,"nm"],
-                 "atomic_length":[adp_constants.ureg.bohr,"bohr"],
-                 "electron_volt":[adp_constants.ureg.electron_volt,"electron-volt"],
-                 "electron-volt":[adp_constants.ureg.electron_volt,"electron-volt"],
-                 "ev"           :[adp_constants.ureg.electron_volt,"electron-volt"],
-                 "hartree"      :[adp_constants.ureg.hartree,"hartree"],
-                 "ha"           :[adp_constants.ureg.hartree,"hartree"],
-                 "atomic_energy":[adp_constants.ureg.hartree,"hartree"],
-                 "joule"        :[adp_constants.ureg.joule,"joule"],
-                 "j"            :[adp_constants.ureg.joule,"joule"]}
     if not obj.valid:
         return
     else:
@@ -114,7 +99,7 @@ def check_float_unit(obj,key,units):
         obj.valid = False
         # break with appropriate error here
     if u != "percent":
-        u = units_dict[u]
+        u = adp_constants.units_dict[u]
     else:
         val = val/100
     obj.settings[key] = adp_obj.Tolerance(val,u)

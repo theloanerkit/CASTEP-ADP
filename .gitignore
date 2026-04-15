@@ -2,6 +2,7 @@
 *.bib
 *.castep
 *.cell
+!tests/data/*.cell
 *.md
 *.param
 *.zip

@@ -1,9 +1,24 @@
 import pint
 
-VERSION = "1.0.0"
+VERSION = "0.0.1"
 
 # for handling units
 ureg = pint.UnitRegistry()
+
+units_dict = {"angstrom"     :[ureg.angstrom,"angstrom"],
+              "ang"          :[ureg.angstrom,"angstrom"],
+              "bohr"         :[ureg.bohr,"bohr"],
+              "nanometer"    :[ureg.nanometer,"nm"],
+              "nm"           :[ureg.nanometer,"nm"],
+              "atomic_length":[ureg.bohr,"bohr"],
+              "electron_volt":[ureg.electron_volt,"electron-volt"],
+              "electron-volt":[ureg.electron_volt,"electron-volt"],
+              "ev"           :[ureg.electron_volt,"electron-volt"],
+              "hartree"      :[ureg.hartree,"hartree"],
+              "ha"           :[ureg.hartree,"hartree"],
+              "atomic_energy":[ureg.hartree,"hartree"],
+              "joule"        :[ureg.joule,"joule"],
+              "j"            :[ureg.joule,"joule"]}
 
 masses = {"H":  1.00794,
           "He": 4.0026,
@@ -123,6 +138,9 @@ masses = {"H":  1.00794,
           "Lv": 293.2, 
           "Ts": 293.21, 
           "Og": 294.21}
+
+for key in masses.keys():
+  masses[key] = masses[key] * ureg.unified_atomic_mass_unit
 
 #environment_colours = [
 #  "#009e73",

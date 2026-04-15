@@ -1,0 +1,6 @@
+%block lattice_cart
+4.02  0.00  0.00
+0.00  4.02  0.00
+0.00  0.00  4.02   
+%endblock lattice_cart
+
