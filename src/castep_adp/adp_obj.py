@@ -43,10 +43,14 @@ class Cell:
         self.positions_abs = positions
 
     def construct_cell(self):
+        if len(self.lattice) == 0:
+            raise err.IncompatibleCell("no lattice cart")
+        if len(self.positions) == 0:
+            raise err.IncompatibleCell("no positions block")
         if "cart" in self.lattice[0].lower():
             self.construct_cart()
         elif "abc" in self.lattice[0].lower():
-            err.no_lattice_cart()
+            raise err.IncompatibleCell("no lattice cart")
         if "abs" in self.positions[0].lower():
             self.construct_abs()
         elif "frac" in self.positions[0].lower():
@@ -54,28 +58,45 @@ class Cell:
 
     def construct_cart(self):
         start = 1
+        unit = adp_constants.ureg.angstrom
         if len(self.lattice) == 6:
-            # units included, but assuming angstrom for now
+            if self.lattice[1] in adp_constants.units_dict.keys():
+                unit = adp_constants.units_dict[self.lattice[1]][0]
+            else:
+                raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
+            if unit.dimensionality != "[length]":
+                raise err.UnitError(kind="dimensionality",unit=unit,dim="[length]")
             start += 1
         lattice = np.zeros((3,3),dtype=float)*adp_constants.ureg.angstrom
+        print("lattice",unit)
         for i in range(start,start+3):
-            lattice[i-start] = np.asarray(self.lattice[i].split(),dtype=float)*adp_constants.ureg.angstrom
+            lattice[i-start] = np.asarray(self.lattice[i].split(),dtype=float)*unit
+        print(lattice)
         self.lattice_cart = lattice
 
     def construct_abs(self):
         positions = {}
         elements = {}
+        unit = adp_constants.ureg.angstrom
         for line in self.positions[1:-1]:
             line = line.split()
+            print(line)
             if len(line)==1:
-                # units line, ignore (still assuming angstroms)
+                if line[0] in adp_constants.units_dict.keys():
+                    unit = adp_constants.units_dict[line[0]][0]
+                else:
+                    raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
+                if unit.dimensionality != "[length]":
+                    raise err.UnitError(kind="dimensionality",unit=unit,dim="[length]")
+                print(unit)
                 continue
             if line[0] not in elements.keys():
                 elements[line[0]] = 0
             elements[line[0]] += 1
             name = f"{line[0]} {elements[line[0]]}"
-            pos = np.asarray(line[1:4],dtype=float)*adp_constants.ureg.angstrom
+            pos = np.asarray(line[1:4],dtype=float)*unit
             positions[name] = pos
+        print(positions)
         self.positions_abs = positions
 
     def construct_frac(self):
