@@ -1,7 +1,6 @@
 import re
 import numpy as np
 from . import adp_obj
-from . import adp_constants
 from . import err
 
 def parse_md(seed,equ_timesteps=0):
@@ -55,31 +54,31 @@ def parse_md(seed,equ_timesteps=0):
   return md
 
 def parse_cell(seed):
-    with open(f"{seed}.cell","r") as file:
-        cell_file = [line.strip() for line in file.readlines()]
+  with open(f"{seed}.cell","r") as file:
+    cell_file = [line.strip() for line in file.readlines()]
 
-    lattice_block = []
-    positions_block = []
+  lattice_block = []
+  positions_block = []
 
-    l_block = False
-    p_block = False
+  l_block = False
+  p_block = False
 
-    for line in cell_file:
-        if "%block" in line.lower():
-            if "positions" in line.lower():
-                p_block = True
-            elif "lattice" in line.lower():
-                l_block = True
-        if l_block:
-            lattice_block.append(line)
-        elif p_block:
-            positions_block.append(line)
-        if "%endblock" in line.lower():
-            if "positions" in line.lower():
-                p_block = False
-            elif "lattice" in line.lower():
-                l_block = False
+  for line in cell_file:
+    if "%block" in line.lower():
+      if "positions" in line.lower():
+        p_block = True
+      elif "lattice" in line.lower():
+        l_block = True
+    if l_block:
+      lattice_block.append(line)
+    elif p_block:
+      positions_block.append(line)
+    if "%endblock" in line.lower():
+      if "positions" in line.lower():
+        p_block = False
+      elif "lattice" in line.lower():
+        l_block = False
 
-    cell = adp_obj.Cell(lattice_block,positions_block)
+  cell = adp_obj.Cell(lattice_block,positions_block)
 
-    return cell
+  return cell
