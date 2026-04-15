@@ -9,7 +9,7 @@ from . import settings
 from . import err
 from . import adp_io
 from . import parse
-from . import adp_obj
+from . import obj
 
 # set up dictionary with masses of elements -> move to constants
 #masses = {}
@@ -219,7 +219,7 @@ def main() -> None:
         md_obj = parse.parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
-            atoms[label] = adp_obj.Atom(label)
+            atoms[label] = obj.Atom(label)
         keys = list(atoms.keys())
 
         if user_settings.settings["detect_environment"] is not None:

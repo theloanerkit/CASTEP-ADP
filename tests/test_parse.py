@@ -23,7 +23,6 @@ def check_md_obj(obj,timesteps,atoms):
   if np.shape(obj.velocities) != (timesteps,len(atoms),3):
     errors += 1
     errmsg += f"shape of velocities array does not match, got {np.shape(obj.velocities)}, expected {(timesteps,len(atoms),3)}\n"
-
   return errors, errmsg
 
 def check_cell_obj(obj,cart,abs):
@@ -40,9 +39,6 @@ def check_cell_obj(obj,cart,abs):
       if not np.all(abs[key]==obj.positions_abs[key]):
         errors += 1
         errmsg += f"atoms positions do not match for {key}: \n  got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
-  #if obj.positions_abs != abs:
-  #  errors += 1
-  #  errmsg += f"positions do not match: \ngot      {obj.positions_abs}\nexpected {abs}"
   return errors, errmsg
 
 def test_N2_md_no_equ():
