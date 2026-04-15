@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import adp_parse, adp_constants,err
+from castep_adp import adp_constants,err,parse
 import numpy as np
 
 def check_md_obj(obj,timesteps,atoms):
@@ -46,18 +46,18 @@ def check_cell_obj(obj,cart,abs):
   return errors, errmsg
 
 def test_N2_md_no_equ():
-  n2 = adp_parse.parse_md("tests/data/test_N2")
+  n2 = parse.parse_md("tests/data/test_N2")
   errors,errmsg = check_md_obj(n2,2,["N 1","N 2"])
   assert errors==0,errmsg
 
 def test_N2_md():
-  n2 = adp_parse.parse_md("tests/data/test_N2",1)
+  n2 = parse.parse_md("tests/data/test_N2",1)
   errors,errmsg = check_md_obj(n2,1,["N 1","N 2"])
   assert errors==0,errmsg
 
 def test_N2_md_too_much_equ():
   with pytest.raises(err.ParseMDError):
-    n2 = adp_parse.parse_md("tests/data/test_N2",4)
+    n2 = parse.parse_md("tests/data/test_N2",4)
 
 
 def test_BTO_cart_frac():
@@ -67,7 +67,7 @@ def test_BTO_cart_frac():
          "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_frac")
+  bto = parse.parse_cell("tests/data/test_BaTiO_cart_frac")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
@@ -78,21 +78,21 @@ def test_BTO_cart_abs():
          "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_abs")
+  bto = parse.parse_cell("tests/data/test_BaTiO_cart_abs")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_abc():
   with pytest.raises(err.IncompatibleCell):
-    bto = adp_parse.parse_cell("tests/data/test_BaTiO_abc")
+    bto = parse.parse_cell("tests/data/test_BaTiO_abc")
 
 def test_BTO_no_lattice():
   with pytest.raises(err.IncompatibleCell):
-    bto = adp_parse.parse_cell("tests/data/test_BaTiO_frac")
+    bto = parse.parse_cell("tests/data/test_BaTiO_frac")
 
 def test_BTO_no_positions():
   with pytest.raises(err.IncompatibleCell):
-    bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart")
+    bto = parse.parse_cell("tests/data/test_BaTiO_cart")
 
 def test_BTO_cart_units_ang():
   cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
@@ -101,7 +101,7 @@ def test_BTO_cart_units_ang():
          "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_ang")
+  bto = parse.parse_cell("tests/data/test_BaTiO_cart_ang")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
@@ -112,7 +112,7 @@ def test_BTO_cart_units_bohr():
          "O 3": (np.asarray([0,5,5])*adp_constants.ureg.bohr).to("angstrom"),
          "Ti 1": (np.asarray([5,5,5])*adp_constants.ureg.bohr).to("angstrom"),
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_bohr")
+  bto = parse.parse_cell("tests/data/test_BaTiO_cart_bohr")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
@@ -123,7 +123,7 @@ def test_BTO_abs_units_ang():
          "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_abs_ang")
+  bto = parse.parse_cell("tests/data/test_BaTiO_abs_ang")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
@@ -134,14 +134,14 @@ def test_BTO_abs_units_nm():
          "O 3": np.asarray([0,20.1,20.1])*adp_constants.ureg.angstrom,
          "Ti 1": np.asarray([20.1,20.1,20.1])*adp_constants.ureg.angstrom,
          "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
-  bto = adp_parse.parse_cell("tests/data/test_BaTiO_abs_nm")
+  bto = parse.parse_cell("tests/data/test_BaTiO_abs_nm")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_cart_units_unknown():
   with pytest.raises(err.UnitError):
-    bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_furlong")
+    bto = parse.parse_cell("tests/data/test_BaTiO_cart_furlong")
 
 def test_BTO_cart_units_electronvolt():
   with pytest.raises(err.UnitError):
-    bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_electronvolt")
+    bto = parse.parse_cell("tests/data/test_BaTiO_cart_electronvolt")

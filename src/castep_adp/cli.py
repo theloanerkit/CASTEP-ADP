@@ -8,7 +8,7 @@ from . import adp_constants
 from . import settings
 from . import err
 from . import adp_io
-from . import adp_parse
+from . import parse
 from . import adp_obj
 
 # set up dictionary with masses of elements -> move to constants
@@ -216,7 +216,7 @@ def main() -> None:
             err.file_not_found(args.seed,".md")
 
         print("parsing md file")
-        md_obj = adp_parse.parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
+        md_obj = parse.parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
             atoms[label] = adp_obj.Atom(label)
@@ -229,7 +229,7 @@ def main() -> None:
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
                 err.file_not_found(args.seed,".cell")
-            cell_obj = adp_parse.parse_cell(args.seed)
+            cell_obj = parse.parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
