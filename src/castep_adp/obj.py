@@ -161,9 +161,7 @@ class Atom:
       self.adp_ke_map = m
 
   def get_sorted_magnitudes(self,vecs):
-    magnitudes = []
-    for j in range(len(vecs)):
-      magnitudes.append(np.linalg.norm(vecs[j].magnitude))
+    magnitudes = [np.linalg.norm(v.magnitude) for v in vecs]
     idxs = np.argsort(magnitudes)
     magnitudes = magnitudes*vecs.units
     return magnitudes[idxs], idxs
@@ -175,9 +173,7 @@ class Atom_Environment:
     self.magnitudes, self.sort_arr = self.get_sorted_magnitudes()
 
   def get_sorted_magnitudes(self):
-    magnitudes = []
-    for j in range(len(self.adp)):
-      magnitudes.append(np.linalg.norm(self.adp[j].magnitude))
+    magnitudes = [np.linalg.norm(adp.magnitude) for adp in self.adp]
     idxs = np.argsort(magnitudes)
     magnitudes = magnitudes*self.adp.units
     return magnitudes[idxs], idxs
