@@ -1,6 +1,6 @@
-from . import err
+from . import adp_err
 from . import adp_constants
-from .obj import Tolerance
+from .adp_obj import Tolerance
 
 def check_int(obj,key,ubound=None,lbound=None):
   # check if parameter is an integer
@@ -15,17 +15,17 @@ def check_int(obj,key,ubound=None,lbound=None):
     is_int = obj.settings[key].isdigit()
   
   if not is_int:
-    raise err.InvalidParamter(key,obj.settings[key],kind="integer")
+    raise adp_err.InvalidParamter(key,obj.settings[key],kind="integer")
   else:
     obj.settings[key] = int(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
+      raise adp_err.InvalidParamter(key,obj.settings[key],lbound=lbound)
   
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
+      raise adp_err.InvalidParamter(key,obj.settings[key],ubound=ubound)
   
 def check_float(obj,key,ubound=None,lbound=None):
   # check if parameter is a float
@@ -42,17 +42,17 @@ def check_float(obj,key,ubound=None,lbound=None):
     is_float = obj.settings[key].replace(".","",1).isdigit()
 
   if not is_float:
-    raise err.InvalidParamter(key,obj.settings[key],kind="float")
+    raise adp_err.InvalidParamter(key,obj.settings[key],kind="float")
   else:
     obj.settings[key] = float(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
+      raise adp_err.InvalidParamter(key,obj.settings[key],lbound=lbound)
   
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
+      raise adp_err.InvalidParamter(key,obj.settings[key],ubound=ubound)
 
 def check_boolean(obj,key):
   # check if parameter is a boolean
@@ -62,13 +62,13 @@ def check_boolean(obj,key):
     obj.settings[key] = False
   else:
     obj.valid = False
-    raise err.InvalidParamter(key,obj.settings[key])
+    raise adp_err.InvalidParamter(key,obj.settings[key])
     
 def check_keywords(obj,key,keywords,map=None):
   # check if parameter is within a set of keywords
   if obj.valid and obj.settings[key] not in keywords:
     obj.valid = False
-    raise err.InvalidParamter(key,obj.settings[key],optns=keywords)
+    raise adp_err.InvalidParamter(key,obj.settings[key],optns=keywords)
   if map is not None:
     if obj.settings[key] in map.keys():
       obj.settings[key] = map[obj.settings[key]]
@@ -92,7 +92,7 @@ def check_float_unit(obj,key,units):
             val = float(obj.settings[key].split()[0])
         except:
             obj.valid = False
-            err.invalid_parameter(key,obj.settings[key],"float")
+            adp_err.invalid_parameter(key,obj.settings[key],"float")
 
     u = obj.settings[key].split()[1]
     if u not in units:
@@ -171,7 +171,7 @@ class Settings:
           data = [line.strip() for line in file.readlines()]
     except:
       # settings file not found
-      err.file_not_found(self.seed,".adp")
+      adp_err.file_not_found(self.seed,".adp")
 
     for line in data:
       line = line.split("!")[0].strip()   # remove comments
@@ -182,13 +182,13 @@ class Settings:
       if len(test) == 2:
         k,v = test[0],test[1]
       else:
-        err.unexpected_format(line,self.seed)
+        adp_err.unexpected_format(line,self.seed)
 
       k,v = k.strip(),v.strip()           # remove any extra whitespace from key/value
 
       if k not in self.settings.keys():
         self.valid = False
-        err.unknown_keyword(k,self.seed)
+        adp_err.unknown_keyword(k,self.seed)
       else:
         self.settings[k] = v
         self.user_def[k] = True

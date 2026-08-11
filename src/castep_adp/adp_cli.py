@@ -3,11 +3,11 @@ import numpy as np
 import os
 # -----------------
 from . import adp_constants
-from .settings import Settings
-from . import err
+from .adp_settings import Settings
+from . import adp_err
 from . import adp_io
-from .parse import parse_md, parse_cell
-from . import obj
+from .adp_parse import parse_md, parse_cell
+from . import adp_obj
 
 def calc_r_eq_from_md(md):
   # initialise array
@@ -146,13 +146,13 @@ def main() -> None:
 
     if not args.dryrun:
         if not os.path.isfile(f"{args.seed}.md"):
-            err.file_not_found(args.seed,".md")
+            adp_err.file_not_found(args.seed,".md")
 
         print("parsing md file")
         md_obj = parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
-            atoms[label] = obj.Atom(label)
+            atoms[label] = adp_obj.Atom(label)
         keys = list(atoms.keys())
 
         if user_settings.settings["detect_environment"] is not None:
@@ -161,7 +161,7 @@ def main() -> None:
         if user_settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
-                err.file_not_found(args.seed,".cell")
+                adp_err.file_not_found(args.seed,".cell")
             cell_obj = parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
