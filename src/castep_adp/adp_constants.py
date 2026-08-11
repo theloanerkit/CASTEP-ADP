@@ -143,30 +143,6 @@ masses = {"H":  1.00794,
 
 masses = {key: ureg.Quantity(value, "amu") for key, value in masses.items()}
 
-#environment_colours = [
-#  "#009e73",
-#  "#0072b2",
-#  "#56b4e9",
-#  "#cc79a7",
-#  "#d55e00",
-#  "#e69f00",
-#  "#f0e442"
-#]
-#environment_colours = [
-#  "002859",
-#  "007899",
-#  "10d275",
-#  "bfff3c",
-#  "68aed4",
-#  "430067",
-#  "94216a",
-#  "ff2674",
-#  "ff80a4",
-#  "ffd100",
-#  "ff8426",
-#  "d62411",
-#  "7f0622"
-#]
 environment_colours = [
   "600000",
   "AF0000",

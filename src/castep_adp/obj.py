@@ -134,10 +134,6 @@ class Tolerance:
       val2 = val2.to(tol.units)
 
     return abs(val2-val1) < tol
-#    if abs(val2-val1) < tol:
-#      return True
-#    else:
-#      return False
 
 class Atom:
   def __init__(self,name):

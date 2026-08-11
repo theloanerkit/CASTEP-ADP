@@ -56,8 +56,6 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
             file.write(f"}} scale {scale} ")
             if environments is None or atoms[i].split()[0] in other_dict:
                 col = adp_constants.jmol_colours[atoms[i].split()[0]]
-            #elif atoms[i].split()[0] in other_dict:
-            #    col = adp_constants.jmol_colours[atoms[i].split()[0]]
             else:
                 col = adp_constants.environment_colours[env_dict[atoms[i]]]
             file.write(f"color [x{col}]")
@@ -120,7 +118,6 @@ def write_summary(file,settings,atoms):
     for atom in keys:
         elements.add(atom.split()[0])
     elements = list(elements)
-    #print(elements)
     file.write("begin SUMMARY\n\n")
     for elem in elements:
         string = ""
@@ -134,7 +131,6 @@ def write_summary(file,settings,atoms):
                     ke_tensor += atoms[atom].ke
             for vec in ke_tensor:
                 string = extend_str("<ke>",col)
-                #unit = settings.output_unit["energy"][0]
                 str_vec = vec_to_string(vec.to(energy_unit))
                 string += write_columns(str_vec,col_num)
                 file.write(f"{string}\n")

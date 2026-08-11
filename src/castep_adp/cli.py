@@ -15,9 +15,7 @@ def calc_r_eq_from_md(md):
 
   # add up all positions
   for timestep in md.positions:
-    #print(timestep)
     r_eq += timestep
-    #print(r_eq)
 
   # average over timesteps
   r_eq /= md.timesteps

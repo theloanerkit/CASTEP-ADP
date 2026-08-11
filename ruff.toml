@@ -2,7 +2,7 @@ line-length = 100
 [lint]
 select = ["F","E","W","UP","RUF","TRY","FURB","PL","PGH","PERF","N","I","FLY","TC","SIM","RET",
 					"PT","PYI","PIE","G","LOG","ISC","INT","FA","EXE","T10","DTZ","C4","B","BLE","S",
-					"ASYNC","YTT"]
+					"ASYNC","YTT","ERA"]
 ignore = ["E701","PLR2004","PLR0917","PLR0913","PLR0915","PLR0912"]
 
 [lint.per-file-ignores]
