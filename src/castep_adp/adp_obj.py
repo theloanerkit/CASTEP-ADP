@@ -1,5 +1,5 @@
 import numpy as np
-from . import adp_err
+from . import adp_err as err
 from . import adp_constants
 
 class MD:
