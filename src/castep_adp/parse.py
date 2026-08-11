@@ -6,7 +6,7 @@ from . import err
 def parse_md(seed,equ_timesteps=0):
   # load md file
   with open(f"{seed}.md") as file:
-    md_file = [line.strip() for line in file.readlines()]
+    md_file = [line.strip() for line in file]
 
   # get the start index of each of the timestep blocks
   # searches for "<-- E" and subtracts 1 to get starting index
@@ -57,7 +57,7 @@ def parse_md(seed,equ_timesteps=0):
 
 def parse_cell(seed):
   with open(f"{seed}.cell") as file:
-    cell_file = [line.strip() for line in file.readlines()]
+    cell_file = [line.strip() for line in file]
 
   lattice_block = []
   positions_block = []

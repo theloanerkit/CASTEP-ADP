@@ -49,8 +49,7 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
             file.write(f"ellipsoid ID {tmp} AXES ")
             for j in range(len(axes[i])):
                 file.write("{ ")
-                for k in range(len(axes[i][j])):
-                    file.write(f"{float(axes[i][j][k])} ")
+                file.writelines(f"{float(axes[i][j][k])} " for k in range(len(axes[i][j])))
                 file.write("} ")
             file.write("center { ")
             for j in range(len(atom_pos[i])):
