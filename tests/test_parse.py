@@ -25,7 +25,7 @@ def check_md_obj(obj,timesteps,atoms):
     errmsg += f"got {np.shape(obj.positions)}, expected {(timesteps,len(atoms),3)}\n"
   if np.shape(obj.velocities) != (timesteps,len(atoms),3):
     errors += 1
-    errmsg += "shape of velocities array does not match, " 
+    errmsg += "shape of velocities array does not match, "
     errmsg += f"got {np.shape(obj.velocities)}, expected {(timesteps,len(atoms),3)}\n"
   return errors, errmsg
 

@@ -135,7 +135,7 @@ class Tolerance:
       return True
     else:
       return False
-        
+
 class Atom:
   def __init__(self,name):
     self.name = name
@@ -167,7 +167,7 @@ class Atom:
     idxs = np.argsort(magnitudes)
     magnitudes = magnitudes*vecs.units
     return magnitudes[idxs], idxs
-        
+
 class Atom_Environment:
   def __init__(self,label,adp):
     self.name = label

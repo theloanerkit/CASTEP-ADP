@@ -105,7 +105,7 @@ class InvalidParamter(Exception):
       if self.kind[0] in ["a","e","i","o","u"]: n = "n"
       msg += f"{self.key} must be a{n} {self.kind}, got {self.value} instead"
     return msg
-  
+
 class ParseMDError(Exception):
   def __init__(self,kind,equ_timesteps=None):
     self.kind = kind

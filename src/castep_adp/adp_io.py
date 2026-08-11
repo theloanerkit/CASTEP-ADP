@@ -161,7 +161,7 @@ def write_out(seed,settings,atoms,dryrun):
 
                 if atoms[atom].r_eq is not None:
                     string = extend_str("<r_eq>",col)
-                    
+
                     r_eq = vec_to_string(atoms[atom].r_eq.to(length_unit))
                     string += write_columns(r_eq,col_num)
                     file.write(f"{string}\n")

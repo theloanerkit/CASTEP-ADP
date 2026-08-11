@@ -7,13 +7,13 @@ def check_int(obj,key,ubound=None,lbound=None):
   # optionally check if parameter value is within set bounds
   if not obj.valid:   # something else has gone wrong
     return
-  
+
   # check if integer
   if obj.settings[key][0] in ("-","+"):
     is_int = obj.settings[key][1:].isdigit()
   else:
     is_int = obj.settings[key].isdigit()
-  
+
   if not is_int:
     raise err.InvalidParamter(key,obj.settings[key],kind="integer")
   else:
@@ -22,17 +22,17 @@ def check_int(obj,key,ubound=None,lbound=None):
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
       raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
-  
+
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
       raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
-  
+
 def check_float(obj,key,ubound=None,lbound=None):
   # check if parameter is a float
   # optionally check if parameter is within set bounds
   if not obj.valid:    # something else has gone wrong
      return
-  
+
   # check if float
   if obj.settings[key][0] in ("-","+"):
     is_float = obj.settings[key][1:].replace(".","",1).isdigit()
@@ -49,7 +49,7 @@ def check_float(obj,key,ubound=None,lbound=None):
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
       raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
-  
+
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
       raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
@@ -63,7 +63,7 @@ def check_boolean(obj,key):
   else:
     obj.valid = False
     raise err.InvalidParamter(key,obj.settings[key])
-    
+
 def check_keywords(obj,key,keywords,map=None):
   # check if parameter is within a set of keywords
   if obj.valid and obj.settings[key] not in keywords:
@@ -103,9 +103,9 @@ def check_float_unit(obj,key,units):
     else:
         val = val/100
     obj.settings[key] = Tolerance(val,u)  ## needs to be adp_obj
-        
-    
-    
+
+
+
 
 # first item in list is default value
 # all further items are check functions to be called on user input
@@ -230,5 +230,5 @@ class Settings:
         self.settings[key] = "atomic"
 
 
-            
-        
+
+

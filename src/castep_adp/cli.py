@@ -38,7 +38,7 @@ def calc_covariance_matrix(md,r_eq):
   for timestep in md.positions:
     disp = timestep - r_eq
     cov_mat += np.multiply(np.expand_dims(disp,2),np.expand_dims(disp,1))
-    
+
   # average over timesteps
   cov_mat /= md.timesteps
   return cov_mat
@@ -51,7 +51,7 @@ def calc_ke_tensor(md):
   # add up |v><v| matrices
   for timestep in md.velocities:
     v_tensor += np.multiply(np.expand_dims(timestep,2),np.expand_dims(timestep,1))
-    
+
   # average over timesteps
   v_tensor /= md.timesteps
 
@@ -118,7 +118,7 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
         env.add(atom)
         environments.append(env)
   return environments
-  
+
 def get_map(one,two):
   m = {0:-1,1:-1,2:-1}
   for i in range(3):
@@ -145,7 +145,7 @@ def main() -> None:
             "adp"  :None,
             "uij"  :None,
             "ke"   :None}
-    
+
     atoms = {}
 
     if not args.dryrun:
@@ -182,7 +182,7 @@ def main() -> None:
             print("calculating covariance matrix")
             cov_mat = calc_covariance_matrix(md_obj,data["r_eq"])
             data["uij"] = cov_mat
-            
+
 
             print("calculating adp axes")
             unit = cov_mat.units**0.5
@@ -193,7 +193,7 @@ def main() -> None:
                 atoms[keys[i]].uij = cov_mat[i]
                 atoms[keys[i]].adp = axes[i]
 
-        
+
 
         if user_settings.settings["calculate_ke"]:
             print("calculating ke")
@@ -216,7 +216,7 @@ def main() -> None:
                   user_settings.settings["environment_tolerance_adp"],
                   user_settings.settings["environment_tolerance_ke"])
 
-        
+
 
     print("writing")
     adp_io.write_out(args.seed,user_settings,atoms,args.dryrun)

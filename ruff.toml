@@ -1,6 +1,6 @@
 line-length = 100
 [lint]
-select = ["F","E"]
+select = ["F","E","W"]
 ignore = ["E701"]
 
 [lint.per-file-ignores]
