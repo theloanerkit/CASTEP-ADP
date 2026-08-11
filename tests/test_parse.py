@@ -40,11 +40,10 @@ def check_cell_obj(obj,cart,abs):
     if key not in obj.positions_abs:
       errors += 1
       errmsg += f"atoms do not match: {key} not found\n"
-    else:
-      if not np.all(abs[key]==obj.positions_abs[key]):
-        errors += 1
-        errmsg += f"atoms positions do not match for {key}: \n  "
-        errmsg += f"got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
+    elif not np.all(abs[key]==obj.positions_abs[key]):
+      errors += 1
+      errmsg += f"atoms positions do not match for {key}: \n  "
+      errmsg += f"got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
   return errors, errmsg
 
 def test_N2_md_no_equ():

@@ -26,8 +26,8 @@ def parse_md(seed,equ_timesteps=0):
       offset += 1
     elif "<-- R" in line:
       in_block = True
-      line = line.split()
-      atoms.append(f"{line[0]} {line[1]}")    # add atom name and number to list
+      words = line.split()
+      atoms.append(f"{words[0]} {words[1]}")    # add atom name and number to list
 
   idxs = idxs[equ_timesteps+1:]       # indexs that we care about (first block is at t=0)
 

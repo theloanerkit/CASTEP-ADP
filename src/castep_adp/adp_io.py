@@ -57,11 +57,10 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
             file.write(f"}} scale {scale} ")
             if environments is None:
                 col = adp_constants.jmol_colours[atoms[i].split()[0]]
+            elif atoms[i].split()[0] in other_dict.keys():
+                col = adp_constants.jmol_colours[atoms[i].split()[0]]
             else:
-                if atoms[i].split()[0] in other_dict.keys():
-                    col = adp_constants.jmol_colours[atoms[i].split()[0]]
-                else:
-                    col = adp_constants.environment_colours[env_dict[atoms[i]]]
+                col = adp_constants.environment_colours[env_dict[atoms[i]]]
             file.write(f"color [x{col}]")
             file.write("\n")
 

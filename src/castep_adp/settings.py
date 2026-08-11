@@ -174,11 +174,11 @@ class Settings:
       err.file_not_found(self.seed,".adp")
 
     for line in data:
-      line = line.split("!")[0].strip()   # remove comments
-      if len(line) == 0:      # ignore empty lines
+      line_tidy = line.split("!")[0].strip()   # remove comments
+      if len(line_tidy) == 0:      # ignore empty lines
         continue
 
-      test = line.lower().split(":")      # all lowercase, : delimiter
+      test = line_tidy.lower().split(":")      # all lowercase, : delimiter
       if len(test) == 2:
         k,v = test[0],test[1]
       else:

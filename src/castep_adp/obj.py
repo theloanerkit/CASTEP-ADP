@@ -77,20 +77,20 @@ class Cell:
     elements = {}
     unit = ureg.angstrom
     for line in self.positions[1:-1]:
-      line = line.split()
-      if len(line)==1:
-        if line[0] in units_dict.keys():
-          unit = units_dict[line[0]][0]
+      words = line.split()
+      if len(words)==1:
+        if words[0] in units_dict.keys():
+          unit = units_dict[words[0]][0]
         else:
           raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
         if unit.dimensionality != "[length]":
           raise err.UnitError(kind="dimensionality",unit=unit,dim="[length]")
         continue
-      if line[0] not in elements.keys():
-        elements[line[0]] = 0
-      elements[line[0]] += 1
-      name = f"{line[0]} {elements[line[0]]}"
-      pos = np.asarray(line[1:4],dtype=float)*unit
+      if words[0] not in elements.keys():
+        elements[words[0]] = 0
+      elements[words[0]] += 1
+      name = f"{words[0]} {elements[words[0]]}"
+      pos = np.asarray(words[1:4],dtype=float)*unit
       positions[name] = pos
     self.positions_abs = positions
 
@@ -98,12 +98,12 @@ class Cell:
     positions = {}
     elements = {}
     for line in self.positions[1:-1]:
-      line = line.split()
-      if line[0] not in elements.keys():
-        elements[line[0]] = 0
-      elements[line[0]] += 1
-      name = f"{line[0]} {elements[line[0]]}"
-      pos = np.asarray(line[1:4],dtype=float)
+      words = line.split()
+      if words[0] not in elements.keys():
+        elements[words[0]] = 0
+      elements[words[0]] += 1
+      name = f"{words[0]} {elements[words[0]]}"
+      pos = np.asarray(words[1:4],dtype=float)
       positions[name] = pos
     self.positions_frac = positions
 

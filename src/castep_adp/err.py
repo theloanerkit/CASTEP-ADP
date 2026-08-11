@@ -4,24 +4,24 @@ def no_lattice_cart():
   string = "No lattice_cart block in cell file\n"
   string += "Reading atomic positions from a cell file requires lattice_cart block"
   print(string)
-  quit()
+  sys.exit()
 
 def file_not_found(fname,ext=""):
   string = f"No file found with filename {fname}{ext}\n"
   string += "Please check the seed matches your files."
   print(string)
-  quit()
+  sys.exit()
 
 def unexpected_format(line,fname):
   string = f"Unexpected format in {fname}.adp, line: {line}\n"
   string += "All lines should be of the form <parameter> : <value>"
   print(string)
-  quit()
+  sys.exit()
 
 def unknown_keyword(key,fname):
   string = f"Unknown keyword {key} found in {fname}.adp"
   print(string)
-  quit()
+  sys.exit()
 
 def invalid_parameter(key,value,optns=None,kind=None,lbound=None,ubound=None):
   string = ""
@@ -41,7 +41,7 @@ def invalid_parameter(key,value,optns=None,kind=None,lbound=None,ubound=None):
     if kind[0] in ["a","e","i","o","u"]: n = "n"
     string += f"{key} must be a{n} {kind}, got {value} instead"
   print(string)
-  quit()
+  sys.exit()
 
 class UnitError(Exception):
   def __init__(self,kind,unit,dim=None,loc=None):

@@ -1,10 +1,10 @@
 line-length = 100
 [lint]
-select = ["F","E","W","UP","RUF","TRY","FURB"]
-ignore = ["E701"]
+select = ["F","E","W","UP","RUF","TRY","FURB","PL"]
+ignore = ["E701","PLR2004","PLR0917","PLR0913","PLR0915","PLR0912"]
 
 [lint.per-file-ignores]
-"tests/test_overall.py" = ["F401"] # ignore unused imports -> needed for testing
-"tests/test_example.py" = ["F401"] # TODO: remove test_example
+"tests/test_overall.py" = ["F401","PLC0415"] # ignore unused imports -> needed for testing
+"tests/test_example.py" = ["F401","PLC0415"] # TODO: remove test_example
 
 [format]
