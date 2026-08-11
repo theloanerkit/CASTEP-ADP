@@ -97,9 +97,13 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
           rot_match = True
           for i in range(3):
             if tol_adp is not None:
-              adp_match = tol_adp.within_tolerance(other_atom.adp_magnitudes[i],atom.adp_magnitudes[i])
+              adp_match = tol_adp.within_tolerance(
+                other_atom.adp_magnitudes[i],
+                atom.adp_magnitudes[i])
             if tol_ke is not None:
-              ke_match = tol_ke.within_tolerance(other_atom.ke_magnitudes[i],atom.ke_magnitudes[i])
+              ke_match = tol_ke.within_tolerance(
+                other_atom.ke_magnitudes[i],
+                atom.ke_magnitudes[i])
             if tol_ke is not None and tol_adp is not None:
               rot_match = other_atom.adp_ke_map == atom.adp_ke_map
           if not (adp_match and ke_match and rot_match):
@@ -206,7 +210,11 @@ def main() -> None:
         if user_settings.settings["detect_environment"] is not None:
             print("searching for chemical environments")
             for atom in user_settings.settings["detect_environment"]:
-                environments = detect_environments(atom,atoms,user_settings.settings["environment_tolerance_adp"],user_settings.settings["environment_tolerance_ke"])
+                environments = detect_environments(
+                  atom,
+                  atoms,
+                  user_settings.settings["environment_tolerance_adp"],
+                  user_settings.settings["environment_tolerance_ke"])
 
         
 

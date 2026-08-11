@@ -90,7 +90,7 @@ def check_float_unit(obj,key,units):
     else:
         try:
             val = float(obj.settings[key].split()[0])
-        except:
+        except ValueError:
             obj.valid = False
             err.invalid_parameter(key,obj.settings[key],"float")
 
@@ -169,7 +169,7 @@ class Settings:
       # read in the settings file
       with open(f"{self.seed}.adp","r") as file:
           data = [line.strip() for line in file.readlines()]
-    except:
+    except FileNotFoundError:
       # settings file not found
       err.file_not_found(self.seed,".adp")
 

@@ -13,16 +13,20 @@ def check_md_obj(obj,timesteps,atoms):
     errmsg += f"atoms do not match: got {obj.atoms}, expected {atoms}\n"
   if obj.positions.units != adp_constants.ureg.bohr:
     errors += 1
-    errmsg += f"units of position do not match, got {obj.positions.units}, expected {adp_constants.ureg.bohr}\n"
+    errmsg += "units of position do not match, "
+    errmsg += f"got {obj.positions.units}, expected {adp_constants.ureg.bohr}\n"
   if obj.velocities.units != adp_constants.ureg.bohr/adp_constants.ureg.atomic_unit_of_time:
     errors += 1
-    errmsg += f"units of velocity do not match, got {obj.velocities.units}, expected {adp_constants.ureg.bohr/adp_constants.ureg.atomic_unit_of_time}\n"
+    errmsg += f"units of velocity do not match, got {obj.velocities.units}, expected "
+    errmsg += f"{adp_constants.ureg.bohr/adp_constants.ureg.atomic_unit_of_time}\n"
   if np.shape(obj.positions) != (timesteps,len(atoms),3):
     errors += 1
-    errmsg += f"shape of positions array does not match, got {np.shape(obj.positions)}, expected {(timesteps,len(atoms),3)}\n"
+    errmsg += "shape of positions array does not match, "
+    errmsg += f"got {np.shape(obj.positions)}, expected {(timesteps,len(atoms),3)}\n"
   if np.shape(obj.velocities) != (timesteps,len(atoms),3):
     errors += 1
-    errmsg += f"shape of velocities array does not match, got {np.shape(obj.velocities)}, expected {(timesteps,len(atoms),3)}\n"
+    errmsg += "shape of velocities array does not match, " 
+    errmsg += f"got {np.shape(obj.velocities)}, expected {(timesteps,len(atoms),3)}\n"
   return errors, errmsg
 
 def check_cell_obj(obj,cart,abs):
@@ -30,7 +34,8 @@ def check_cell_obj(obj,cart,abs):
   errmsg = "\n"
   if not np.all(obj.lattice_cart == cart):
     errors += 1
-    errmsg += f"lattice does not match: \n  got      {obj.lattice_cart}\n  expected {cart}\n"
+    errmsg += "lattice does not match: \n  "
+    errmsg += f"got      {obj.lattice_cart}\n  expected {cart}\n"
   for key in abs.keys():
     if key not in obj.positions_abs:
       errors += 1
@@ -38,7 +43,8 @@ def check_cell_obj(obj,cart,abs):
     else:
       if not np.all(abs[key]==obj.positions_abs[key]):
         errors += 1
-        errmsg += f"atoms positions do not match for {key}: \n  got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
+        errmsg += f"atoms positions do not match for {key}: \n  "
+        errmsg += f"got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
   return errors, errmsg
 
 def test_N2_md_no_equ():

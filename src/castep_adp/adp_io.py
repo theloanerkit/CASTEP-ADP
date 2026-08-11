@@ -15,7 +15,7 @@ def vec_to_string(vec):
     for v in vec:
         try:
             num = v.magnitude
-        except:
+        except AttributeError:
             num = v
         num = f"{num}"
         if num[0] != "-":

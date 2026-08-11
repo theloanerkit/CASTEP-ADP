@@ -1,5 +1,7 @@
+line-length = 100
 [lint]
-select = ["F"]
+select = ["F","E"]
+ignore = ["E701"]
 
 [lint.per-file-ignores]
 "tests/test_overall.py" = ["F401"] # ignore unused imports -> needed for testing

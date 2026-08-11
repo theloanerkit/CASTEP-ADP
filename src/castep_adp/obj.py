@@ -1,6 +1,6 @@
 import numpy as np
 from . import err
-from . import adp_constants
+from .adp_constants import ureg, units_dict
 
 class MD:
   def __init__(self,timesteps,atoms,positions,velocities):
@@ -19,8 +19,8 @@ class MD:
     return string
 
   def apply_units(self):
-    self.positions *= adp_constants.ureg.atomic_unit_of_length
-    self.velocities *= (adp_constants.ureg.atomic_unit_of_length/adp_constants.ureg.atomic_unit_of_time)
+    self.positions *= ureg.atomic_unit_of_length
+    self.velocities *= (ureg.atomic_unit_of_length/ureg.atomic_unit_of_time)
 
 class Cell:
   def __init__(self,lattice,positions):
@@ -36,7 +36,7 @@ class Cell:
   def get_positions_abs(self):
     positions = {}
     for key in self.positions_frac.keys():
-      pos = np.zeros(3,dtype=float)*adp_constants.ureg.angstrom
+      pos = np.zeros(3,dtype=float)*ureg.angstrom
       for i in range(3):
         pos += self.positions_frac[key][i] * self.lattice_cart[i]
       positions[key] = pos
@@ -58,16 +58,16 @@ class Cell:
 
   def construct_cart(self):
     start = 1
-    unit = adp_constants.ureg.angstrom
+    unit = ureg.angstrom
     if len(self.lattice) == 6:
-      if self.lattice[1] in adp_constants.units_dict.keys():
-        unit = adp_constants.units_dict[self.lattice[1]][0]
+      if self.lattice[1] in units_dict.keys():
+        unit = units_dict[self.lattice[1]][0]
       else:
         raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
       if unit.dimensionality != "[length]":
         raise err.UnitError(kind="dimensionality",unit=unit,dim="[length]")
       start += 1
-    lattice = np.zeros((3,3),dtype=float)*adp_constants.ureg.angstrom
+    lattice = np.zeros((3,3),dtype=float)*ureg.angstrom
     for i in range(start,start+3):
       lattice[i-start] = np.asarray(self.lattice[i].split(),dtype=float)*unit
     self.lattice_cart = lattice
@@ -75,12 +75,12 @@ class Cell:
   def construct_abs(self):
     positions = {}
     elements = {}
-    unit = adp_constants.ureg.angstrom
+    unit = ureg.angstrom
     for line in self.positions[1:-1]:
       line = line.split()
       if len(line)==1:
-        if line[0] in adp_constants.units_dict.keys():
-          unit = adp_constants.units_dict[line[0]][0]
+        if line[0] in units_dict.keys():
+          unit = units_dict[line[0]][0]
         else:
           raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
         if unit.dimensionality != "[length]":

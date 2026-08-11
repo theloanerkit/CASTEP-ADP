@@ -10,7 +10,9 @@ def parse_md(seed,equ_timesteps=0):
 
   # get the start index of each of the timestep blocks
   # searches for "<-- E" and subtracts 1 to get starting index
-  idxs = np.asarray([i for i in range(len(md_file)) if re.match(".*<-- E$",md_file[i]) is not None])-1
+  idxs = np.asarray(
+    [i for i in range(len(md_file)) if re.match(".*<-- E$",md_file[i]) is not None]
+  )-1
   
   # create list of atom names
   offset = 0
@@ -18,7 +20,7 @@ def parse_md(seed,equ_timesteps=0):
   atoms = []
   start,stop = idxs[0],idxs[1]      # +6 gets to the start of <-- R block
   for line in md_file[start:stop]:
-    if "<-- R" not in line and in_block:         # finished looking at positions, so we have all the atoms
+    if "<-- R" not in line and in_block:  # finished looking at positions, so we have all the atoms
       break
     elif "<-- R" not in line and not in_block:
       offset += 1

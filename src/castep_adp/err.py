@@ -57,7 +57,8 @@ class UnitError(Exception):
     if self.kind == "unknown unit":
       msg += f"Unknown unit {self.unit} in {self.loc}"
     if self.kind == "dimensionality":
-      msg += f"Inconsistent dimensionality in units: expected {self.dim}, got {self.unit} with dimensionality {self.unit.dimensionality}"
+      msg += f"Inconsistent dimensionality in units: expected {self.dim}, "
+      msg += f"got {self.unit} with dimensionality {self.unit.dimensionality}"
     return msg
 
 class IncompatibleCell(Exception):
@@ -117,9 +118,11 @@ class ParseMDError(Exception):
     if self.kind == "no timesteps":
       msg += "no timesteps found\n"
       if self.equ_timesteps is None:
-        msg += "  This is likely due to either an empty MD file, or the number of equilibration timesteps set too high"
+        msg += "  This is likely due to either an empty MD file, "
+        msg += "or the number of equilibration timesteps set too high"
       elif self.equ_timesteps == 0:
         msg += "  This is likely due to an empty MD file"
       else:
-        msg += f"  This is likely due to the number of equilibration timesteps being set too high (equilibration timesteps set to {self.equ_timesteps})"
+        msg += "  This is likely due to the number of equilibration timesteps being set too high"
+        msg += f" (equilibration timesteps set to {self.equ_timesteps})"
     return msg
