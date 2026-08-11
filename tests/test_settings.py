@@ -1,5 +1,7 @@
 import pytest
-from castep_adp import settings,adp_constants,err
+
+from castep_adp import adp_constants, err, settings
+
 
 def check_dict(s,dict):
   errors = 0

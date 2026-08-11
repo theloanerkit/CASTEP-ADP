@@ -1,6 +1,8 @@
-import pytest
-from castep_adp import adp_constants,err,parse
 import numpy as np
+import pytest
+
+from castep_adp import adp_constants, err, parse
+
 
 def check_md_obj(obj,timesteps,atoms):
   errors = 0

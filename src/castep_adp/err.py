@@ -1,5 +1,6 @@
 import sys
 
+
 def no_lattice_cart():
   string = "No lattice_cart block in cell file\n"
   string += "Reading atomic positions from a cell file requires lattice_cart block"

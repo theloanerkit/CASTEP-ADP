@@ -1,4 +1,5 @@
-from castep_adp import parse, settings, adp_io, obj, cli
+from castep_adp import adp_io, cli, obj, parse, settings
+
 
 def test_module_imports():
   import castep_adp

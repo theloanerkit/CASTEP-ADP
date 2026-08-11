@@ -1,5 +1,6 @@
-from . import adp_constants
 import numpy as np
+
+from . import adp_constants
 
 col = 12
 col_num = 24

@@ -1,6 +1,8 @@
 import numpy as np
+
 from . import err
-from .adp_constants import ureg, units_dict
+from .adp_constants import units_dict, ureg
+
 
 class MD:
   def __init__(self,timesteps,atoms,positions,velocities):

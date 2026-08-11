@@ -1,7 +1,9 @@
 import re
+
 import numpy as np
-from . import obj
-from . import err
+
+from . import err, obj
+
 
 def parse_md(seed,equ_timesteps=0):
   # load md file

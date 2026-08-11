@@ -1,13 +1,13 @@
 import argparse
-import numpy as np
 import os
+
+import numpy as np
+
 # -----------------
-from . import adp_constants
+from . import adp_constants, adp_io, err, obj
+from .parse import parse_cell, parse_md
 from .settings import Settings
-from . import err
-from . import adp_io
-from .parse import parse_md, parse_cell
-from . import obj
+
 
 def calc_r_eq_from_md(md):
   # initialise array

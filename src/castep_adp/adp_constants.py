@@ -1,5 +1,6 @@
-import pint
 from importlib.metadata import version
+
+import pint
 
 VERSION = version("castep_adp")
 
