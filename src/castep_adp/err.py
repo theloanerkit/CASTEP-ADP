@@ -61,7 +61,7 @@ class UnitError(Exception):
       msg += f"got {self.unit} with dimensionality {self.unit.dimensionality}"
     return msg
 
-class IncompatibleCell(Exception):
+class IncompatibleCellError(Exception):
   def __init__(self,kind):
     self.kind = kind
     self.__suppress_context__=True
@@ -76,15 +76,15 @@ class IncompatibleCell(Exception):
       msg += "No positions block in cell file"
     return msg
 
-class NoLatticeCart(IncompatibleCell):
+class NoLatticeCartError(IncompatibleCellError):
   def __init__(self):
     super().__init__(kind="no lattice cart")
 
-class NoPositionsBlock(IncompatibleCell):
+class NoPositionsBlockError(IncompatibleCellError):
   def __init__(self):
     super().__init__(kind="no positions block")
 
-class InvalidParamter(Exception):
+class InvalidParamterError(Exception):
   def __init__(self,key,value,optns=None,kind=None,lbound=None,ubound=None):
     self.key = key
     self.value = value
@@ -135,6 +135,6 @@ class ParseMDError(Exception):
         msg += f" (equilibration timesteps set to {self.equ_timesteps})"
     return msg
 
-class NoTimesteps(ParseMDError):
+class NoTimestepsError(ParseMDError):
   def __init__(self,equ_timesteps):
     super().__init__(kind="no timesteps",equ_timesteps=equ_timesteps)

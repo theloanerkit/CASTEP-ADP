@@ -44,13 +44,13 @@ class Cell:
 
   def construct_cell(self):
     if len(self.lattice) == 0:
-      raise err.NoLatticeCart
+      raise err.NoLatticeCartError()
     if len(self.positions) == 0:
-      raise err.NoPositionsBlock
+      raise err.NoPositionsBlockError()
     if "cart" in self.lattice[0].lower():
       self.construct_cart()
     elif "abc" in self.lattice[0].lower():
-      raise err.NoLatticeCart()
+      raise err.NoLatticeCartError()
     if "abs" in self.positions[0].lower():
       self.construct_abs()
     elif "frac" in self.positions[0].lower():
@@ -166,7 +166,7 @@ class Atom:
     magnitudes = magnitudes*vecs.units
     return magnitudes[idxs], idxs
 
-class Atom_Environment:
+class AtomEnvironment:
   def __init__(self,label,adp):
     self.name = label
     self.adp = adp

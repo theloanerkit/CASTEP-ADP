@@ -32,7 +32,7 @@ def parse_md(seed,equ_timesteps=0):
   idxs = idxs[equ_timesteps+1:]       # indexs that we care about (first block is at t=0)
 
   if len(idxs) == 0:
-    raise err.NoTimesteps(equ_timesteps)
+    raise err.NoTimestepsError(equ_timesteps)
 
   # set up positions array
   positions = np.zeros((len(idxs),len(atoms),3),dtype=float)

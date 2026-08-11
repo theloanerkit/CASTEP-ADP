@@ -15,17 +15,17 @@ def check_int(obj,key,ubound=None,lbound=None):
     is_int = obj.settings[key].isdigit()
 
   if not is_int:
-    raise err.InvalidParamter(key,obj.settings[key],kind="integer")
+    raise err.InvalidParamterError(key,obj.settings[key],kind="integer")
   else:
     obj.settings[key] = int(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
+      raise err.InvalidParamterError(key,obj.settings[key],lbound=lbound)
 
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
+      raise err.InvalidParamterError(key,obj.settings[key],ubound=ubound)
 
 def check_float(obj,key,ubound=None,lbound=None):
   # check if parameter is a float
@@ -42,17 +42,17 @@ def check_float(obj,key,ubound=None,lbound=None):
     is_float = obj.settings[key].replace(".","",1).isdigit()
 
   if not is_float:
-    raise err.InvalidParamter(key,obj.settings[key],kind="float")
+    raise err.InvalidParamterError(key,obj.settings[key],kind="float")
   else:
     obj.settings[key] = float(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],lbound=lbound)
+      raise err.InvalidParamterError(key,obj.settings[key],lbound=lbound)
 
   if ubound is not None and obj.settings[key] > ubound:   # check upper bound
       obj.valid = False
-      raise err.InvalidParamter(key,obj.settings[key],ubound=ubound)
+      raise err.InvalidParamterError(key,obj.settings[key],ubound=ubound)
 
 def check_boolean(obj,key):
   # check if parameter is a boolean
@@ -62,13 +62,13 @@ def check_boolean(obj,key):
     obj.settings[key] = False
   else:
     obj.valid = False
-    raise err.InvalidParamter(key,obj.settings[key])
+    raise err.InvalidParamterError(key,obj.settings[key])
 
 def check_keywords(obj,key,keywords,map=None):
   # check if parameter is within a set of keywords
   if obj.valid and obj.settings[key] not in keywords:
     obj.valid = False
-    raise err.InvalidParamter(key,obj.settings[key],optns=keywords)
+    raise err.InvalidParamterError(key,obj.settings[key],optns=keywords)
   if map is not None:
     if obj.settings[key] in map.keys():
       obj.settings[key] = map[obj.settings[key]]
