@@ -113,13 +113,23 @@ class Tolerance:
     self.unit = unit
 
   def within_tolerance(self,val1,val2):
+    if isinstance(val1,(int,float)) and isinstance(val2,(int,float)):
+      pass # both dimensionless -> fine (unless tolerance is not?)
+    elif isinstance(val1,(int,float)) and not isinstance(val2,(int,float)):
+      # val1: dimensionless, val2: has dimension
+      raise err.UnitError(kind="dimensionality",dim="dimensionless",unit=val2.units)
+    elif isinstance(val2,(int,float)) and not isinstance(val1,(int,float)):
+      # val1: has dimension, val2: dimensionless
+      raise err.UnitError(kind="dimensionality",dim="dimensionless",unit=val1.units)
+    elif val1.units.dimensionality != val2.units.dimensionality:
+      raise err.UnitError(kind="dimensionality",dim=val1.units.dimensionality,unit=val2.units)
     if self.unit == "percent":
       tol = self.value*val1
     else:
       tol = self.value*self.unit
 
-    val1 = val1.to(tol.units)
-    val2 = val2.to(tol.units)
+      val1 = val1.to(tol.units)
+      val2 = val2.to(tol.units)
 
     if abs(val2-val1) < tol:
       return True
