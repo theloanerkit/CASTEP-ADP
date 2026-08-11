@@ -167,7 +167,7 @@ class Settings:
     """
     try:
       # read in the settings file
-      with open(f"{self.seed}.adp","r") as file:
+      with open(f"{self.seed}.adp") as file:
           data = [line.strip() for line in file.readlines()]
     except FileNotFoundError:
       # settings file not found

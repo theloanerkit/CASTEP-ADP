@@ -56,7 +56,7 @@ def parse_md(seed,equ_timesteps=0):
   return md
 
 def parse_cell(seed):
-  with open(f"{seed}.cell","r") as file:
+  with open(f"{seed}.cell") as file:
     cell_file = [line.strip() for line in file.readlines()]
 
   lattice_block = []
