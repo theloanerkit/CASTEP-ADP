@@ -1,0 +1,8 @@
+[lint]
+select = ["F"]
+
+[lint.per-file-ignores]
+"tests/test_overall.py" = ["F401"] # ignore unused imports -> needed for testing
+"tests/test_example.py" = ["F401"] # TODO: remove test_example
+
+[format]
