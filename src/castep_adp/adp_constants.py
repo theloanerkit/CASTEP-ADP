@@ -1,6 +1,7 @@
 import pint
+from importlib.metadata import version
 
-VERSION = "0.0.1"
+VERSION = version("castep_adp")
 
 # for handling units
 ureg = pint.UnitRegistry()
