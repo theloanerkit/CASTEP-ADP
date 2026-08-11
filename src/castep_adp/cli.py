@@ -3,10 +3,10 @@ import numpy as np
 import os
 # -----------------
 from . import adp_constants
-from . import settings
+from .settings import Settings
 from . import err
 from . import adp_io
-from . import parse
+from .parse import parse_md, parse_cell
 from . import obj
 
 def calc_r_eq_from_md(md):
@@ -134,7 +134,7 @@ def main() -> None:
     args = get_parser().parse_args()
 
     print("loading settings")
-    user_settings = settings.Settings(args.seed)
+    user_settings = Settings(args.seed)
 
     data = {"atoms":None,
             "r_eq" :None,
@@ -149,7 +149,7 @@ def main() -> None:
             err.file_not_found(args.seed,".md")
 
         print("parsing md file")
-        md_obj = parse.parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
+        md_obj = parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
             atoms[label] = obj.Atom(label)
@@ -162,7 +162,7 @@ def main() -> None:
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
                 err.file_not_found(args.seed,".cell")
-            cell_obj = parse.parse_cell(args.seed)
+            cell_obj = parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
