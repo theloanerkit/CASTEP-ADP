@@ -45,7 +45,8 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
                 idx += 1
     with open(f"{seed}_ellipsoid{env}.spt","w") as file:
         for i in range(len(axes)):
-            file.write(f"ellipsoid ID {atoms[i].replace(" ","")} AXES ")
+            tmp = atoms[i].replace(" ","")
+            file.write(f"ellipsoid ID {tmp} AXES ")
             for j in range(len(axes[i])):
                 file.write("{ ")
                 for k in range(len(axes[i][j])):
