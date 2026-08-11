@@ -1,7 +1,5 @@
 import argparse
-#import pint
 import numpy as np
-#import scipy.linalg as sp
 import os
 # -----------------
 from . import adp_constants
@@ -10,11 +8,6 @@ from . import err
 from . import adp_io
 from . import parse
 from . import obj
-
-# set up dictionary with masses of elements -> move to constants
-#masses = {}
-#for key in adp_constants.masses.keys():
-#    masses[key] = adp_constants.masses[key] * adp_constants.ureg.unified_atomic_mass_unit
 
 def calc_r_eq_from_md(md):
   # initialise array
@@ -80,59 +73,16 @@ def evals_evecs(matrix,atoms,sqrt=False):
       axes[i,j,:] += evals[j]*evecs[j,:]
   return axes
 
-#def detect_environments_o(atom,data,tol):
-#    atoms = []
-#    #tol = adp_obj.Tolerance(0.2,"percent") # 20 percent
-#    #lookup = 
-#    for i in range(len(data["atoms"])):
-#        element = data["atoms"][i].split()[0].lower()
-#        if element == atom:
-#            a = adp_obj.Atom_Environment(data["atoms"][i],data["adp"][i])
-#            atoms.append(a)
-#    environments = []
-#    for a in atoms:
-#        if len(environments) == 0:
-#            env = set()
-#            env.add(a)
-#            environments.append(env)
-#        else:
-#            #print(f"checking environment of {a.name}")
-#            in_any_env = False
-#            for env in environments:
-#                in_env = True
-#                # check magnitudes:
-#                for test in env:
-#                    for i in range(3):
-#                        mag = tol.within_tolerance(test.magnitudes[i],a.magnitudes[i])
-#                        if not mag:
-#                            in_env = False
-#                            break
-#                    if not in_env:
-#                        break
-#                if in_env:
-#                    in_any_env = True
-#                    env.add(a)
-#                    #print(f"   found environment matching {a.name}")
-#                    break
-#            if not in_any_env:
-#                env = set()
-#                env.add(a)
-#                environments.append(env)
-#                #print(f"   not found an environment for {a.name}, creating a new one")
-#    return environments
-                
 def detect_environments(elem,atoms,tol_adp,tol_ke):
   print("hello")
   environments = []
   selected_atoms = []     # atoms we are checking environment for based on input parameter
   for key in atoms.keys():
-    #print(key,key.split()[0].lower,elem)
     if key.split()[0].lower() == elem:
       atoms[key].calc_magnitudes(tol_adp,tol_ke)
       selected_atoms.append(atoms[key])
   print(f"checking {len(selected_atoms)} atoms")
   for atom in selected_atoms:
-    #print(f"checking atom {atom.name}")
     if len(environments) == 0:
       env = set()
       env.add(atom)
@@ -142,9 +92,6 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
       for env in environments:
         in_env = True
         for other_atom in env:
-          #print(f"other atom: {other_atom.name}")
-          #print(f"  adps: {other_atom.adp_magnitudes}   {other_atom.adp_sort}")
-          #print(f"  kes:  {other_atom.ke_magnitudes}   {other_atom.ke_sort}")
           adp_match = True
           ke_match = True
           rot_match = True
@@ -157,12 +104,8 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
               rot_match = other_atom.adp_ke_map == atom.adp_ke_map
           if not (adp_match and ke_match and rot_match):
             in_env = False
-            #print(adp_match,ke_match)
             break
         if in_env:
-          #print(f"atom: {atom.name}")
-          #print(f"  adps: {atom.adp_magnitudes}   {atom.adp_sort}")
-          #print(f"  kes:  {atom.ke_magnitudes}   {atom.ke_sort}")
           in_any_env = True
           env.add(atom)
           break
@@ -170,16 +113,6 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
         env = set()
         env.add(atom)
         environments.append(env)
-    #input("next")
-  #for env in environments:
-  #  print("environment: ")
-  #  for atom in env:
-  #    m = get_map(atom.adp_sort,atom.ke_sort)
-  #    #s = ""
-  #    for k in m.keys():
-      #   s += f"{k} -> {m[k]}    "
-      #print(f"    atom: {atom.name}    {atom.adp_sort}, {atom.ke_sort}")
-      #print(f"        : {atom.adp_magnitudes}    {atom.ke_magnitudes}")
   return environments
   
 def get_map(one,two):
