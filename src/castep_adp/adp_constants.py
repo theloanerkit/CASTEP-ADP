@@ -140,8 +140,7 @@ masses = {"H":  1.00794,
           "Ts": 293.21, 
           "Og": 294.21}
 
-for key in masses.keys():
-  masses[key] = masses[key] * ureg.unified_atomic_mass_unit
+masses = {key: ureg.Quantity(value, "amu") for key, value in masses.items()}
 
 #environment_colours = [
 #  "#009e73",
