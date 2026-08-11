@@ -19,3 +19,4 @@ plot.py
 castep-adp-old.py
 *.f90
 *.sh
+!tests/data/*.md
