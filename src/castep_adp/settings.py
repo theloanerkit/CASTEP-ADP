@@ -16,8 +16,7 @@ def check_int(obj,key,ubound=None,lbound=None):
 
   if not is_int:
     raise err.InvalidParamterError(key,obj.settings[key],kind="integer")
-  else:
-    obj.settings[key] = int(obj.settings[key])
+  obj.settings[key] = int(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
@@ -43,8 +42,7 @@ def check_float(obj,key,ubound=None,lbound=None):
 
   if not is_float:
     raise err.InvalidParamterError(key,obj.settings[key],kind="float")
-  else:
-    obj.settings[key] = float(obj.settings[key])
+  obj.settings[key] = float(obj.settings[key])
 
   if lbound is not None and obj.settings[key] < lbound:   # check lower bound
       obj.valid = False
@@ -86,12 +84,11 @@ def check_string_arr(obj,key,keywords=None):
 def check_float_unit(obj,key,units):
     if not obj.valid:
         return
-    else:
-        try:
-            val = float(obj.settings[key].split()[0])
-        except ValueError:
-            obj.valid = False
-            err.invalid_parameter(key,obj.settings[key],"float")
+    try:
+        val = float(obj.settings[key].split()[0])
+    except ValueError:
+        obj.valid = False
+        err.invalid_parameter(key,obj.settings[key],"float")
 
     u = obj.settings[key].split()[1]
     if u not in units:
@@ -148,8 +145,7 @@ class Settings:
     self.set_units()
 
   def __repr__(self):
-    string = ""
-    return string
+    return ""
 
   def initialise(self):
     """sets up settings and user_def dictionary based on the values in

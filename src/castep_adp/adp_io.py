@@ -7,9 +7,7 @@ col_num = 24
 col_long = 32
 
 def extend_str(string,width):
-    string = " "+string
-    string = string + " "*(width-len(string))
-    return string
+    return  " " + string + " "*(width - (len(string)+1))
 
 def vec_to_string(vec):
     string = []

@@ -24,7 +24,7 @@ def parse_md(seed,equ_timesteps=0):
   for line in md_file[start:stop]:
     if "<-- R" not in line and in_block:  # finished looking at positions, so we have all the atoms
       break
-    elif "<-- R" not in line and not in_block:
+    if "<-- R" not in line and not in_block:
       offset += 1
     elif "<-- R" in line:
       in_block = True
@@ -53,9 +53,7 @@ def parse_md(seed,equ_timesteps=0):
       velocities[i,j-start,:] = np.asarray(md_file[j].split()[2:5],dtype=float)
 
   # create MD object
-  md = obj.MD(len(idxs),atoms,positions,velocities)
-
-  return md
+  return obj.MD(len(idxs),atoms,positions,velocities)
 
 def parse_cell(seed):
   with open(f"{seed}.cell") as file:
@@ -83,6 +81,4 @@ def parse_cell(seed):
       elif "lattice" in line.lower():
         l_block = False
 
-  cell = obj.Cell(lattice_block,positions_block)
-
-  return cell
+  return obj.Cell(lattice_block,positions_block)
