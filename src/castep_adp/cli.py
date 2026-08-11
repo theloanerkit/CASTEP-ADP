@@ -205,8 +205,8 @@ def main() -> None:
         environments = None
         if user_settings.settings["detect_environment"] is not None:
             print("searching for chemical environments")
-            for atom in settings.settings["detect_environment"]:
-                environments = detect_environments(atom,atoms,user_settings.settings["environment_tolerance_adp"],settings.settings["environment_tolerance_ke"])
+            for atom in user_settings.settings["detect_environment"]:
+                environments = detect_environments(atom,atoms,user_settings.settings["environment_tolerance_adp"],user_settings.settings["environment_tolerance_ke"])
 
         
 

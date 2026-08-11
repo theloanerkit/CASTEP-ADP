@@ -53,7 +53,7 @@ def test_N2_md():
 
 def test_N2_md_too_much_equ():
   with pytest.raises(err.ParseMDError):
-    n2 = parse.parse_md("tests/data/test_N2",4)
+    _ = parse.parse_md("tests/data/test_N2",4)
 
 
 def test_BTO_cart_frac():
@@ -80,15 +80,15 @@ def test_BTO_cart_abs():
 
 def test_BTO_abc():
   with pytest.raises(err.IncompatibleCell):
-    bto = parse.parse_cell("tests/data/test_BaTiO_abc")
+    _ = parse.parse_cell("tests/data/test_BaTiO_abc")
 
 def test_BTO_no_lattice():
   with pytest.raises(err.IncompatibleCell):
-    bto = parse.parse_cell("tests/data/test_BaTiO_frac")
+    _ = parse.parse_cell("tests/data/test_BaTiO_frac")
 
 def test_BTO_no_positions():
   with pytest.raises(err.IncompatibleCell):
-    bto = parse.parse_cell("tests/data/test_BaTiO_cart")
+    _ = parse.parse_cell("tests/data/test_BaTiO_cart")
 
 def test_BTO_cart_units_ang():
   cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
@@ -136,8 +136,8 @@ def test_BTO_abs_units_nm():
 
 def test_BTO_cart_units_unknown():
   with pytest.raises(err.UnitError):
-    bto = parse.parse_cell("tests/data/test_BaTiO_cart_furlong")
+    _ = parse.parse_cell("tests/data/test_BaTiO_cart_furlong")
 
 def test_BTO_cart_units_electronvolt():
   with pytest.raises(err.UnitError):
-    bto = parse.parse_cell("tests/data/test_BaTiO_cart_electronvolt")
+    _ = parse.parse_cell("tests/data/test_BaTiO_cart_electronvolt")

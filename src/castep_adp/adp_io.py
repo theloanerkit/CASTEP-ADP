@@ -117,7 +117,6 @@ def write_header(file,keys,settings):
     file.write("end HEADER\n\n")
 
 def write_summary(file,settings,atoms):
-    length_unit = settings.output_units["length"][0]
     energy_unit = settings.output_units["energy"][0]
     elements = set()
     keys = list(atoms.keys())

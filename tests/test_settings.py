@@ -156,7 +156,7 @@ def test_energy_unit_hartree():
   errors, errmsg = check_dict(s4.output_units,output_units)
   assert errors==0, errmsg
 
-def test_energy_unit_hartree():
+def test_energy_unit_joule():
   output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
                   "energy":[adp_constants.ureg.joule,"joule"]}
   s1 = settings.Settings("tests/data/test_joule_1")
@@ -188,11 +188,11 @@ def test_eq_timesteps():
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = settings.Settings("tests/data/test_eq_ts_2")
+    _ = settings.Settings("tests/data/test_eq_ts_2")
   with pytest.raises(err.InvalidParamter):
-    s3 = settings.Settings("tests/data/test_eq_ts_3")
+    _ = settings.Settings("tests/data/test_eq_ts_3")
   with pytest.raises(err.InvalidParamter):
-    s4 = settings.Settings("tests/data/test_eq_ts_4")
+    _ = settings.Settings("tests/data/test_eq_ts_4")
 
 def test_write_jmol():
   params_dict = {
@@ -216,7 +216,7 @@ def test_write_jmol():
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = settings.Settings("tests/data/test_write_jmol_2")
+    _ = settings.Settings("tests/data/test_write_jmol_2")
   params_dict["jmol_scale"] = 10
   s3 = settings.Settings("tests/data/test_write_jmol_3")
   errors, errmsg = check_dict(s3.settings,params_dict)
@@ -227,9 +227,9 @@ def test_write_jmol():
   s5 = settings.Settings("tests/data/test_write_jmol_5")
   errors, errmsg = check_dict(s5.settings,params_dict)
   with pytest.raises(err.InvalidParamter):
-    s6 = settings.Settings("tests/data/test_write_jmol_6")
+    _ = settings.Settings("tests/data/test_write_jmol_6")
   with pytest.raises(err.InvalidParamter):
-    s7 = settings.Settings("tests/data/test_write_jmol_7")
+    _ = settings.Settings("tests/data/test_write_jmol_7")
 
 def test_r_equ():
   params_dict = {
@@ -253,7 +253,7 @@ def test_r_equ():
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = settings.Settings("tests/data/test_r_equ_2")
+    _ = settings.Settings("tests/data/test_r_equ_2")
 
 def test_detect_env():
   params_dict = {
