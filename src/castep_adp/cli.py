@@ -45,8 +45,8 @@ def calc_covariance_matrix(md,r_eq):
 
 def calc_ke_tensor(md):
   # initialise array
-  v_tensor = np.zeros((len(md.atoms),3,3))*(md.velocities[0,0,0].units**2)
-  ke_tensor = np.zeros(np.shape(v_tensor))*(v_tensor[0,0,0].units*adp_constants.masses["H"].units)
+  v_tensor = np.zeros((len(md.atoms),3,3))*(md.velocities.units**2)
+  ke_tensor = np.zeros(np.shape(v_tensor))*adp_constants.ureg.electron_volt
 
   # add up |v><v| matrices
   for timestep in md.velocities:
