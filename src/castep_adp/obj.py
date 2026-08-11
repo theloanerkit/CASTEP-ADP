@@ -37,7 +37,7 @@ class Cell:
 
   def get_positions_abs(self):
     positions = {}
-    for key in self.positions_frac.keys():
+    for key in self.positions_frac:
       pos = np.zeros(3,dtype=float)*ureg.angstrom
       for i in range(3):
         pos += self.positions_frac[key][i] * self.lattice_cart[i]
@@ -62,7 +62,7 @@ class Cell:
     start = 1
     unit = ureg.angstrom
     if len(self.lattice) == 6:
-      if self.lattice[1] in units_dict.keys():
+      if self.lattice[1] in units_dict:
         unit = units_dict[self.lattice[1]][0]
       else:
         raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
@@ -81,14 +81,14 @@ class Cell:
     for line in self.positions[1:-1]:
       words = line.split()
       if len(words)==1:
-        if words[0] in units_dict.keys():
+        if words[0] in units_dict:
           unit = units_dict[words[0]][0]
         else:
           raise err.UnitError(kind="unknown unit",loc="cell file",unit=self.lattice[1])
         if unit.dimensionality != "[length]":
           raise err.UnitError(kind="dimensionality",unit=unit,dim="[length]")
         continue
-      if words[0] not in elements.keys():
+      if words[0] not in elements:
         elements[words[0]] = 0
       elements[words[0]] += 1
       name = f"{words[0]} {elements[words[0]]}"
@@ -101,7 +101,7 @@ class Cell:
     elements = {}
     for line in self.positions[1:-1]:
       words = line.split()
-      if words[0] not in elements.keys():
+      if words[0] not in elements:
         elements[words[0]] = 0
       elements[words[0]] += 1
       name = f"{words[0]} {elements[words[0]]}"
@@ -133,10 +133,11 @@ class Tolerance:
       val1 = val1.to(tol.units)
       val2 = val2.to(tol.units)
 
-    if abs(val2-val1) < tol:
-      return True
-    else:
-      return False
+    return abs(val2-val1) < tol
+#    if abs(val2-val1) < tol:
+#      return True
+#    else:
+#      return False
 
 class Atom:
   def __init__(self,name):

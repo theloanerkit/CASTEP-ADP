@@ -3,11 +3,11 @@ import pytest
 from castep_adp import adp_constants, err, settings
 
 
-def check_dict(s,dict):
+def check_dict(s,c_dict):
   errors = 0
   errmsg = ""
-  for key in dict.keys():
-    if s[key] != dict[key]:
+  for key in c_dict:
+    if s[key] != c_dict[key]:
       if errors == 0:
         errmsg += "Error(s) occured:\n"
       errors += 1

@@ -31,21 +31,21 @@ def check_md_obj(obj,timesteps,atoms):
     errmsg += f"got {np.shape(obj.velocities)}, expected {(timesteps,len(atoms),3)}\n"
   return errors, errmsg
 
-def check_cell_obj(obj,cart,abs):
+def check_cell_obj(obj,cart,p_abs):
   errors = 0
   errmsg = "\n"
   if not np.all(obj.lattice_cart == cart):
     errors += 1
     errmsg += "lattice does not match: \n  "
     errmsg += f"got      {obj.lattice_cart}\n  expected {cart}\n"
-  for key in abs.keys():
+  for key in p_abs:
     if key not in obj.positions_abs:
       errors += 1
       errmsg += f"atoms do not match: {key} not found\n"
-    elif not np.all(abs[key]==obj.positions_abs[key]):
+    elif not np.all(p_abs[key]==obj.positions_abs[key]):
       errors += 1
       errmsg += f"atoms positions do not match for {key}: \n  "
-      errmsg += f"got      {obj.positions_abs[key]}\n  expected {abs[key]}\n"
+      errmsg += f"got      {obj.positions_abs[key]}\n  expected {p_abs[key]}\n"
   return errors, errmsg
 
 def test_n2_md_no_equ():

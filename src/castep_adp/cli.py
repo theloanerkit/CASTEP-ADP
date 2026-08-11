@@ -77,7 +77,7 @@ def detect_environments(elem,atoms,tol_adp,tol_ke):
   print("hello")
   environments = []
   selected_atoms = []     # atoms we are checking environment for based on input parameter
-  for key in atoms.keys():
+  for key in atoms:
     if key.split()[0].lower() == elem:
       atoms[key].calc_magnitudes(tol_adp,tol_ke)
       selected_atoms.append(atoms[key])
@@ -167,7 +167,7 @@ def main() -> None:
             if not os.path.isfile(f"{args.seed}.cell"):
                 err.file_not_found(args.seed,".cell")
             cell_obj = parse_cell(args.seed)
-            for key in cell_obj.positions_abs.keys():
+            for key in cell_obj.positions_abs:
                 atoms[key].r_eq = cell_obj.positions_abs[key]
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
 

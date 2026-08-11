@@ -41,7 +41,7 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
                 env_dict[elem.name] = i
         idx = 0
         for j in range(len(atoms)):
-            if atoms[j] not in env_dict.keys() and atoms[j].split()[0] not in other_dict.keys():
+            if atoms[j] not in env_dict and atoms[j].split()[0] not in other_dict:
                 other_dict[atoms[j].split()[0]] = idx
                 idx += 1
     with open(f"{seed}_ellipsoid{env}.spt","w") as file:
@@ -56,10 +56,10 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
             for j in range(len(atom_pos[i])):
                 file.write(f"{atom_pos[i][j]} ")
             file.write(f"}} scale {scale} ")
-            if environments is None:
+            if environments is None or atoms[i].split()[0] in other_dict:
                 col = adp_constants.jmol_colours[atoms[i].split()[0]]
-            elif atoms[i].split()[0] in other_dict.keys():
-                col = adp_constants.jmol_colours[atoms[i].split()[0]]
+            #elif atoms[i].split()[0] in other_dict:
+            #    col = adp_constants.jmol_colours[atoms[i].split()[0]]
             else:
                 col = adp_constants.environment_colours[env_dict[atoms[i]]]
             file.write(f"color [x{col}]")
@@ -153,7 +153,7 @@ def write_out(seed,settings,atoms,dryrun):
         if not dryrun:
             if settings.settings["element_summary"]:
                 write_summary(file,settings,atoms)
-            for atom in atoms.keys():
+            for atom in atoms:
                 string = extend_str("<atom>",col)
                 string += extend_str(atom,col)
                 file.write(f"{string}\n")

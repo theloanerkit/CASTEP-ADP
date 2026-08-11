@@ -64,14 +64,13 @@ def check_boolean(obj,key):
     obj.valid = False
     raise err.InvalidParamterError(key,obj.settings[key])
 
-def check_keywords(obj,key,keywords,map=None):
+def check_keywords(obj,key,keywords,keymap=None):
   # check if parameter is within a set of keywords
   if obj.valid and obj.settings[key] not in keywords:
     obj.valid = False
     raise err.InvalidParamterError(key,obj.settings[key],optns=keywords)
-  if map is not None:
-    if obj.settings[key] in map.keys():
-      obj.settings[key] = map[obj.settings[key]]
+  if keymap is not None and obj.settings[key] in keymap:
+    obj.settings[key] = keymap[obj.settings[key]]
 
 def check_string_arr(obj,key,keywords=None):
     if obj.valid and keywords is None:
@@ -123,11 +122,11 @@ parameters = {
   "output_length"             :["angstrom",
                                 [check_keywords,
                                  {"keywords":["angstrom","ang","bohr","nanometer","nm","atomic","atomic_length"],
-                                  "map":{"atomic":"atomic_length"}}]],
+                                  "keymap":{"atomic":"atomic_length"}}]],
   "output_energy"             :["electron_volt",
                                 [check_keywords,
                                  {"keywords":["electron_volt","electron-volt","ev","hartree","ha","joule","j","atomic","atomic_energy"],
-                                  "map":{"atomic":"atomic_energy"}}]],
+                                  "keymap":{"atomic":"atomic_energy"}}]],
   "write_jmol"                :[False,[check_boolean,{}]],
   "jmol_scale"                :[5,[check_float,{"lbound":0}]],
   "detect_environment"        :[None,[check_string_arr,{}]],
@@ -156,7 +155,7 @@ class Settings:
     """sets up settings and user_def dictionary based on the values in
        parameters dictionary
     """
-    for key in parameters.keys():
+    for key in parameters:
         self.settings[key] = parameters[key][0]
         self.user_def[key] = False
 
@@ -186,7 +185,7 @@ class Settings:
 
       k,v = k.strip(),v.strip()           # remove any extra whitespace from key/value
 
-      if k not in self.settings.keys():
+      if k not in self.settings:
         self.valid = False
         err.unknown_keyword(k,self.seed)
       else:
@@ -194,7 +193,7 @@ class Settings:
         self.user_def[k] = True
 
   def check(self):
-    for key in self.settings.keys():
+    for key in self.settings:
       if self.user_def[key]:
         for test in parameters[key][1:]:
           test[0](self,key,**test[1])
