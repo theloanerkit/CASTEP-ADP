@@ -76,6 +76,14 @@ class IncompatibleCell(Exception):
       msg += "No positions block in cell file"
     return msg
 
+class NoLatticeCart(IncompatibleCell):
+  def __init__(self):
+    super().__init__(kind="no lattice cart")
+
+class NoPositionsBlock(IncompatibleCell):
+  def __init__(self):
+    super().__init__(kind="no positions block")
+
 class InvalidParamter(Exception):
   def __init__(self,key,value,optns=None,kind=None,lbound=None,ubound=None):
     self.key = key
@@ -126,3 +134,7 @@ class ParseMDError(Exception):
         msg += "  This is likely due to the number of equilibration timesteps being set too high"
         msg += f" (equilibration timesteps set to {self.equ_timesteps})"
     return msg
+
+class NoTimesteps(ParseMDError):
+  def __init__(self,equ_timesteps):
+    super().__init__(kind="no timesteps",equ_timesteps=equ_timesteps)

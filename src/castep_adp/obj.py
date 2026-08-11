@@ -44,13 +44,13 @@ class Cell:
 
   def construct_cell(self):
     if len(self.lattice) == 0:
-      raise err.IncompatibleCell("no lattice cart")
+      raise err.NoLatticeCart
     if len(self.positions) == 0:
-      raise err.IncompatibleCell("no positions block")
+      raise err.NoPositionsBlock
     if "cart" in self.lattice[0].lower():
       self.construct_cart()
     elif "abc" in self.lattice[0].lower():
-      raise err.IncompatibleCell("no lattice cart")
+      raise err.NoLatticeCart()
     if "abs" in self.positions[0].lower():
       self.construct_abs()
     elif "frac" in self.positions[0].lower():
