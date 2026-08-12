@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import os
 # -----------------
-from . import adp_constants
+from . import constants
 from .settings import Settings
 from . import err
 from . import adp_io
@@ -25,7 +25,7 @@ def calc_r_eq_from_md(md):
 
 def reorder_positions(positions,atoms):
   # make sure positions are in the same order as castep outputs in the .md file
-  ordered_pos = np.zeros((len(atoms),3),dtype=float)*adp_constants.ureg.angstrom
+  ordered_pos = np.zeros((len(atoms),3),dtype=float)*constants.ureg.angstrom
   for i in range(len(atoms)):
     ordered_pos[i] += positions[atoms[i]]
   return ordered_pos
@@ -46,7 +46,7 @@ def calc_covariance_matrix(md,r_eq):
 def calc_ke_tensor(md):
   # initialise array
   v_tensor = np.zeros((len(md.atoms),3,3))*(md.velocities.units**2)
-  ke_tensor = np.zeros(np.shape(v_tensor))*adp_constants.ureg.electron_volt
+  ke_tensor = np.zeros(np.shape(v_tensor))*constants.ureg.electron_volt
 
   # add up |v><v| matrices
   for timestep in md.velocities:
@@ -57,7 +57,7 @@ def calc_ke_tensor(md):
 
   # calculate ke tensor
   for i in range(len(md.atoms)):
-    ke_tensor[i,:,:] = v_tensor[i,:,:] * 0.5 * adp_constants.masses[md.atoms[i].split()[0]]
+    ke_tensor[i,:,:] = v_tensor[i,:,:] * 0.5 * constants.masses[md.atoms[i].split()[0]]
   return ke_tensor
 
 def evals_evecs(matrix,atoms,sqrt=False):

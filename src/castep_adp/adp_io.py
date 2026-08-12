@@ -1,4 +1,4 @@
-from . import adp_constants
+from . import constants
 import numpy as np
 
 col = 12
@@ -57,12 +57,12 @@ def write_jmol_script(seed,axes,atoms,atom_pos,scale,environments=None):
                 file.write(f"{atom_pos[i][j]} ")
             file.write(f"}} scale {scale} ")
             if environments is None:
-                col = adp_constants.jmol_colours[atoms[i].split()[0]]
+                col = constants.jmol_colours[atoms[i].split()[0]]
             else:
                 if atoms[i].split()[0] in other_dict.keys():
-                    col = adp_constants.jmol_colours[atoms[i].split()[0]]
+                    col = constants.jmol_colours[atoms[i].split()[0]]
                 else:
-                    col = adp_constants.environment_colours[env_dict[atoms[i]]]
+                    col = constants.environment_colours[env_dict[atoms[i]]]
             file.write(f"color [x{col}]")
             file.write("\n")
 
@@ -70,7 +70,7 @@ def write_header(file,keys,settings):
     length_unit = settings.output_units["length"][1]
     energy_unit = settings.output_units["energy"][1]
     file.write("begin HEADER\n\n")
-    file.write(f"version={adp_constants.VERSION}\n\n")
+    file.write(f"version={constants.VERSION}\n\n")
     file.write("--- Parameters ---\n")
     for key in keys:
         if settings.user_def[key]:

@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import adp_constants, err, parse
+from castep_adp import constants, err, parse
 import numpy as np
 
 def check_md_obj(obj,timesteps,atoms):
@@ -11,12 +11,12 @@ def check_md_obj(obj,timesteps,atoms):
   if obj.atoms != atoms:
     errors += 1
     errmsg += f"atoms do not match: got {obj.atoms}, expected {atoms}\n"
-  if obj.positions.units != adp_constants.ureg.bohr:
+  if obj.positions.units != constants.ureg.bohr:
     errors += 1
-    errmsg += f"units of position do not match, got {obj.positions.units}, expected {adp_constants.ureg.bohr}\n"
-  if obj.velocities.units != adp_constants.ureg.bohr/adp_constants.ureg.atomic_unit_of_time:
+    errmsg += f"units of position do not match, got {obj.positions.units}, expected {constants.ureg.bohr}\n"
+  if obj.velocities.units != constants.ureg.bohr/constants.ureg.atomic_unit_of_time:
     errors += 1
-    errmsg += f"units of velocity do not match, got {obj.velocities.units}, expected {adp_constants.ureg.bohr/adp_constants.ureg.atomic_unit_of_time}\n"
+    errmsg += f"units of velocity do not match, got {obj.velocities.units}, expected {constants.ureg.bohr/constants.ureg.atomic_unit_of_time}\n"
   if np.shape(obj.positions) != (timesteps,len(atoms),3):
     errors += 1
     errmsg += f"shape of positions array does not match, got {np.shape(obj.positions)}, expected {(timesteps,len(atoms),3)}\n"
@@ -57,23 +57,23 @@ def test_N2_md_too_much_equ():
 
 
 def test_BTO_cart_frac():
-  cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
-  abs = {"O 1": np.asarray([2.01,2.01,0])*adp_constants.ureg.angstrom,
-         "O 2": np.asarray([2.01,0,2.01])*adp_constants.ureg.angstrom,
-         "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = np.diag([4.02,4.02,4.02],k=0)*constants.ureg.angstrom
+  abs = {"O 1": np.asarray([2.01,2.01,0])*constants.ureg.angstrom,
+         "O 2": np.asarray([2.01,0,2.01])*constants.ureg.angstrom,
+         "O 3": np.asarray([0,2.01,2.01])*constants.ureg.angstrom,
+         "Ti 1": np.asarray([2.01,2.01,2.01])*constants.ureg.angstrom,
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_cart_frac")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_cart_abs():
-  cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
-  abs = {"O 1": np.asarray([2.01,2.01,0])*adp_constants.ureg.angstrom,
-         "O 2": np.asarray([2.01,0,2.01])*adp_constants.ureg.angstrom,
-         "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = np.diag([4.02,4.02,4.02],k=0)*constants.ureg.angstrom
+  abs = {"O 1": np.asarray([2.01,2.01,0])*constants.ureg.angstrom,
+         "O 2": np.asarray([2.01,0,2.01])*constants.ureg.angstrom,
+         "O 3": np.asarray([0,2.01,2.01])*constants.ureg.angstrom,
+         "Ti 1": np.asarray([2.01,2.01,2.01])*constants.ureg.angstrom,
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_cart_abs")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
@@ -91,45 +91,45 @@ def test_BTO_no_positions():
     bto = parse.parse_cell("tests/data/test_BaTiO_cart")
 
 def test_BTO_cart_units_ang():
-  cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
-  abs = {"O 1": np.asarray([2.01,2.01,0])*adp_constants.ureg.angstrom,
-         "O 2": np.asarray([2.01,0,2.01])*adp_constants.ureg.angstrom,
-         "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = np.diag([4.02,4.02,4.02],k=0)*constants.ureg.angstrom
+  abs = {"O 1": np.asarray([2.01,2.01,0])*constants.ureg.angstrom,
+         "O 2": np.asarray([2.01,0,2.01])*constants.ureg.angstrom,
+         "O 3": np.asarray([0,2.01,2.01])*constants.ureg.angstrom,
+         "Ti 1": np.asarray([2.01,2.01,2.01])*constants.ureg.angstrom,
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_cart_ang")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_cart_units_bohr():
-  cart = (np.diag([10,10,10],k=0)*adp_constants.ureg.bohr).to("angstrom")
-  abs = {"O 1": (np.asarray([5,5,0])*adp_constants.ureg.bohr).to("angstrom"),
-         "O 2": (np.asarray([5,0,5])*adp_constants.ureg.bohr).to("angstrom"),
-         "O 3": (np.asarray([0,5,5])*adp_constants.ureg.bohr).to("angstrom"),
-         "Ti 1": (np.asarray([5,5,5])*adp_constants.ureg.bohr).to("angstrom"),
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = (np.diag([10,10,10],k=0)*constants.ureg.bohr).to("angstrom")
+  abs = {"O 1": (np.asarray([5,5,0])*constants.ureg.bohr).to("angstrom"),
+         "O 2": (np.asarray([5,0,5])*constants.ureg.bohr).to("angstrom"),
+         "O 3": (np.asarray([0,5,5])*constants.ureg.bohr).to("angstrom"),
+         "Ti 1": (np.asarray([5,5,5])*constants.ureg.bohr).to("angstrom"),
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_cart_bohr")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_abs_units_ang():
-  cart = np.diag([4.02,4.02,4.02],k=0)*adp_constants.ureg.angstrom
-  abs = {"O 1": np.asarray([2.01,2.01,0])*adp_constants.ureg.angstrom,
-         "O 2": np.asarray([2.01,0,2.01])*adp_constants.ureg.angstrom,
-         "O 3": np.asarray([0,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ti 1": np.asarray([2.01,2.01,2.01])*adp_constants.ureg.angstrom,
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = np.diag([4.02,4.02,4.02],k=0)*constants.ureg.angstrom
+  abs = {"O 1": np.asarray([2.01,2.01,0])*constants.ureg.angstrom,
+         "O 2": np.asarray([2.01,0,2.01])*constants.ureg.angstrom,
+         "O 3": np.asarray([0,2.01,2.01])*constants.ureg.angstrom,
+         "Ti 1": np.asarray([2.01,2.01,2.01])*constants.ureg.angstrom,
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_abs_ang")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg
 
 def test_BTO_abs_units_nm():
-  cart = np.diag([40.2,40.2,40.2],k=0)*adp_constants.ureg.angstrom
-  abs = {"O 1": np.asarray([20.1,20.1,0])*adp_constants.ureg.angstrom,
-         "O 2": np.asarray([20.1,0,20.1])*adp_constants.ureg.angstrom,
-         "O 3": np.asarray([0,20.1,20.1])*adp_constants.ureg.angstrom,
-         "Ti 1": np.asarray([20.1,20.1,20.1])*adp_constants.ureg.angstrom,
-         "Ba 1": np.asarray([0,0,0])*adp_constants.ureg.angstrom}
+  cart = np.diag([40.2,40.2,40.2],k=0)*constants.ureg.angstrom
+  abs = {"O 1": np.asarray([20.1,20.1,0])*constants.ureg.angstrom,
+         "O 2": np.asarray([20.1,0,20.1])*constants.ureg.angstrom,
+         "O 3": np.asarray([0,20.1,20.1])*constants.ureg.angstrom,
+         "Ti 1": np.asarray([20.1,20.1,20.1])*constants.ureg.angstrom,
+         "Ba 1": np.asarray([0,0,0])*constants.ureg.angstrom}
   bto = parse.parse_cell("tests/data/test_BaTiO_abs_nm")
   errors,errmsg = check_cell_obj(bto,cart,abs)
   assert errors==0,errmsg

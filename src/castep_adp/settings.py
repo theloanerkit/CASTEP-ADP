@@ -1,5 +1,5 @@
 from . import err
-from . import adp_constants
+from . import constants
 from .obj import Tolerance
 
 def check_int(obj,key,ubound=None,lbound=None):
@@ -99,7 +99,7 @@ def check_float_unit(obj,key,units):
         obj.valid = False
         # break with appropriate error here
     if u != "percent":
-        u = adp_constants.units_dict[u]
+        u = constants.units_dict[u]
     else:
         val = val/100
     obj.settings[key] = Tolerance(val,u)  ## needs to be adp_obj
@@ -140,8 +140,8 @@ class Settings:
     self.seed = seed
     self.settings = {}
     self.user_def = {}
-    self.output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
-                         "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+    self.output_units = {"length":[constants.ureg.angstrom,"angstrom"],
+                         "energy":[constants.ureg.electron_volt,"electron-volt"]}
     self.valid = True
     self.initialise()   # set up settings and user_def dict
     self.parse()        # parse input file
@@ -209,20 +209,20 @@ class Settings:
       self.settings["calculate_ke"] = True
 
   def set_units(self):
-    units = {"angstrom"     :[adp_constants.ureg.angstrom,"angstrom"],
-             "ang"          :[adp_constants.ureg.angstrom,"angstrom"],
-             "bohr"         :[adp_constants.ureg.bohr,"bohr"],
-             "nanometer"    :[adp_constants.ureg.nanometer,"nm"],
-             "nm"           :[adp_constants.ureg.nanometer,"nm"],
-             "atomic_length":[adp_constants.ureg.bohr,"bohr"],
-             "electron_volt":[adp_constants.ureg.electron_volt,"electron-volt"],
-             "electron-volt":[adp_constants.ureg.electron_volt,"electron-volt"],
-             "ev"           :[adp_constants.ureg.electron_volt,"electron-volt"],
-             "hartree"      :[adp_constants.ureg.hartree,"hartree"],
-             "ha"           :[adp_constants.ureg.hartree,"hartree"],
-             "atomic_energy":[adp_constants.ureg.hartree,"hartree"],
-             "joule"        :[adp_constants.ureg.joule,"joule"],
-             "j"            :[adp_constants.ureg.joule,"joule"]}
+    units = {"angstrom"     :[constants.ureg.angstrom,"angstrom"],
+             "ang"          :[constants.ureg.angstrom,"angstrom"],
+             "bohr"         :[constants.ureg.bohr,"bohr"],
+             "nanometer"    :[constants.ureg.nanometer,"nm"],
+             "nm"           :[constants.ureg.nanometer,"nm"],
+             "atomic_length":[constants.ureg.bohr,"bohr"],
+             "electron_volt":[constants.ureg.electron_volt,"electron-volt"],
+             "electron-volt":[constants.ureg.electron_volt,"electron-volt"],
+             "ev"           :[constants.ureg.electron_volt,"electron-volt"],
+             "hartree"      :[constants.ureg.hartree,"hartree"],
+             "ha"           :[constants.ureg.hartree,"hartree"],
+             "atomic_energy":[constants.ureg.hartree,"hartree"],
+             "joule"        :[constants.ureg.joule,"joule"],
+             "j"            :[constants.ureg.joule,"joule"]}
     self.output_units["length"] = units[self.settings["output_length"]]
     self.output_units["energy"] = units[self.settings["output_energy"]]
     for key in ["output_length","output_energy"]:

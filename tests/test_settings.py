@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import err, settings, adp_constants
+from castep_adp import err, settings, constants
 
 def check_dict(s,dict):
   errors = 0
@@ -22,8 +22,8 @@ def test_default_settings():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
+    "output_length"            : constants.ureg.angstrom,
+    "output_energy"            : constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -95,8 +95,8 @@ def test_ke_settings_1():
   assert errors==0, errmsg
 
 def test_length_unit_angstrom():
-  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
-                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  output_units = {"length":[constants.ureg.angstrom,"angstrom"],
+                  "energy":[constants.ureg.electron_volt,"electron-volt"]}
   s1 = settings.Settings("tests/data/test_angstrom_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -105,8 +105,8 @@ def test_length_unit_angstrom():
   assert errors==0, errmsg
 
 def test_length_unit_bohr():
-  output_units = {"length":[adp_constants.ureg.bohr,"bohr"],
-                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  output_units = {"length":[constants.ureg.bohr,"bohr"],
+                  "energy":[constants.ureg.electron_volt,"electron-volt"]}
   s1 = settings.Settings("tests/data/test_bohr_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -118,8 +118,8 @@ def test_length_unit_bohr():
   assert errors==0, errmsg
 
 def test_length_unit_nanometer():
-  output_units = {"length":[adp_constants.ureg.nanometer,"nm"],
-                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  output_units = {"length":[constants.ureg.nanometer,"nm"],
+                  "energy":[constants.ureg.electron_volt,"electron-volt"]}
   s1 = settings.Settings("tests/data/test_nanometer_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -128,8 +128,8 @@ def test_length_unit_nanometer():
   assert errors==0, errmsg
 
 def test_energy_unit_electron_volt():
-  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
-                  "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
+  output_units = {"length":[constants.ureg.angstrom,"angstrom"],
+                  "energy":[constants.ureg.electron_volt,"electron-volt"]}
   s1 = settings.Settings("tests/data/test_electron_volt_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -141,8 +141,8 @@ def test_energy_unit_electron_volt():
   assert errors==0, errmsg
 
 def test_energy_unit_hartree():
-  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
-                  "energy":[adp_constants.ureg.hartree,"hartree"]}
+  output_units = {"length":[constants.ureg.angstrom,"angstrom"],
+                  "energy":[constants.ureg.hartree,"hartree"]}
   s1 = settings.Settings("tests/data/test_hartree_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -157,8 +157,8 @@ def test_energy_unit_hartree():
   assert errors==0, errmsg
 
 def test_energy_unit_hartree():
-  output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
-                  "energy":[adp_constants.ureg.joule,"joule"]}
+  output_units = {"length":[constants.ureg.angstrom,"angstrom"],
+                  "energy":[constants.ureg.joule,"joule"]}
   s1 = settings.Settings("tests/data/test_joule_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
@@ -176,8 +176,8 @@ def test_eq_timesteps():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
+    "output_length"            : constants.ureg.angstrom,
+    "output_energy"            : constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -204,8 +204,8 @@ def test_write_jmol():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
+    "output_length"            : constants.ureg.angstrom,
+    "output_energy"            : constants.ureg.electron_volt,
     "write_jmol"               : True,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -241,8 +241,8 @@ def test_r_equ():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
+    "output_length"            : constants.ureg.angstrom,
+    "output_energy"            : constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : None,
@@ -265,8 +265,8 @@ def test_detect_env():
     "calculate_ke"             : False,
     "write_ke"                 : False,
     "element_summary"          : False,
-    "output_length"            : adp_constants.ureg.angstrom,
-    "output_energy"            : adp_constants.ureg.electron_volt,
+    "output_length"            : constants.ureg.angstrom,
+    "output_energy"            : constants.ureg.electron_volt,
     "write_jmol"               : False,
     "jmol_scale"               : 5,
     "detect_environment"       : ["h"],
