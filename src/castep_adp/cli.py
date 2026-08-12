@@ -1,20 +1,23 @@
 import argparse
-import pint
-import numpy as np
-import scipy.linalg as sp
 import os
-# -----------------
-from . import adp_constants
-from . import adp_settings
-from . import adp_err
-from . import adp_io
-from . import adp_parse
-from . import adp_obj
+
+import numpy as np
+import pint
+import scipy.linalg as sp
+
+import castep_adp.err
+from .constants import masses as masses_amu
+from .constants import ureg
+from .settings import Settings, check_string_arr
+from .io import write_jmol_script, write_out
+from .parse import parse_md, parse_cell
+from .adp_obj import Atom
 
 # set up dictionary with masses of elements -> move to constants
-masses = {}
-for key in adp_constants.masses.keys():
-    masses[key] = adp_constants.masses[key] * adp_constants.ureg.unified_atomic_mass_unit
+masses = {
+    key: value * ureg.unified_atomic_mass_unit
+    for key, value in masses_amu.items()
+}
 
 def calc_r_eq_from_md(md):
   # initialise array
@@ -29,7 +32,7 @@ def calc_r_eq_from_md(md):
   return r_eq
 
 def reorder_positions(positions,atoms):
-  ordered_pos = np.zeros((len(atoms),3),dtype=float)*adp_constants.ureg.angstrom
+  ordered_pos = np.zeros((len(atoms),3),dtype=float)*constants.ureg.angstrom
   for i in range(len(atoms)):
     ordered_pos[i] += positions[atoms[i]]
   return ordered_pos
@@ -76,47 +79,6 @@ def evals_evecs(matrix,atoms,sqrt=False):
     for j in range(3):
       axes[i,j,:] += evals[j]*evecs[j,:]
   return axes
-
-#def detect_environments_o(atom,data,tol):
-#    atoms = []
-#    #tol = adp_obj.Tolerance(0.2,"percent") # 20 percent
-#    #lookup = 
-#    for i in range(len(data["atoms"])):
-#        element = data["atoms"][i].split()[0].lower()
-#        if element == atom:
-#            a = adp_obj.Atom_Environment(data["atoms"][i],data["adp"][i])
-#            atoms.append(a)
-#    environments = []
-#    for a in atoms:
-#        if len(environments) == 0:
-#            env = set()
-#            env.add(a)
-#            environments.append(env)
-#        else:
-#            #print(f"checking environment of {a.name}")
-#            in_any_env = False
-#            for env in environments:
-#                in_env = True
-#                # check magnitudes:
-#                for test in env:
-#                    for i in range(3):
-#                        mag = tol.within_tolerance(test.magnitudes[i],a.magnitudes[i])
-#                        if not mag:
-#                            in_env = False
-#                            break
-#                    if not in_env:
-#                        break
-#                if in_env:
-#                    in_any_env = True
-#                    env.add(a)
-#                    #print(f"   found environment matching {a.name}")
-#                    break
-#            if not in_any_env:
-#                env = set()
-#                env.add(a)
-#                environments.append(env)
-#                #print(f"   not found an environment for {a.name}, creating a new one")
-#    return environments
                 
 def detect_environments(elem,atoms,tol_adp,tol_ke):
   print("hello")
@@ -198,7 +160,7 @@ def main() -> None:
     args = get_parser().parse_args()
 
     print("loading settings")
-    settings = adp_settings.Settings(args.seed)
+    settings = Settings(args.seed)
 
     data = {"atoms":None,
             "r_eq" :None,
@@ -210,23 +172,23 @@ def main() -> None:
 
     if not args.dryrun:
         if not os.path.isfile(f"{args.seed}.md"):
-            adp_err.file_not_found(args.seed,".md")
+            castep_adp.err.file_not_found(args.seed,".md")
 
         print("parsing md file")
-        md_obj = adp_parse.parse_md(args.seed,settings.settings["equilibration_timesteps"])
+        md_obj = parse_md(args.seed,settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
-            atoms[label] = adp_obj.Atom(label)
+            atoms[label] = Atom(label)
         keys = list(atoms.keys())
 
         if settings.settings["detect_environment"] is not None:
-            adp_settings.check_string_arr(settings,"detect_environment",md_obj.atoms)
+            check_string_arr(settings,"detect_environment",md_obj.atoms)
 
         if settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
-                adp_err.file_not_found(args.seed,".cell")
-            cell_obj = adp_parse.parse_cell(args.seed)
+                castep_adp.err.file_not_found(args.seed,".cell")
+            cell_obj = parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
             data["r_eq"] = reorder_positions(cell_obj.positions_abs,data["atoms"])
@@ -275,24 +237,24 @@ def main() -> None:
         
 
     print("writing")
-    adp_io.write_out(args.seed,settings,atoms,args.dryrun)
+    write_out(args.seed,settings,atoms,args.dryrun)
     if not args.dryrun:
         if settings.settings["write_jmol"]:
             print("writing jmol")
-            adp_io.write_jmol_script(args.seed,
-                                     data["adp"].to("angstrom").magnitude,
-                                     data["atoms"],
-                                     data["r_eq"].to("angstrom").magnitude,
-                                     settings.settings["jmol_scale"])
+            write_jmol_script(args.seed,
+                              data["adp"].to("angstrom").magnitude,
+                              data["atoms"],
+                              data["r_eq"].to("angstrom").magnitude,
+                              settings.settings["jmol_scale"])
         if settings.settings["detect_environment"] is not None:
             print("writing environments jmol")
             print(f"{len(environments)} environments found")
-            adp_io.write_jmol_script(args.seed,
-                                     data["adp"].to("angstrom").magnitude,
-                                     data["atoms"],
-                                     data["r_eq"].to("angstrom").magnitude,
-                                     settings.settings["jmol_scale"],
-                                     environments)
+            write_jmol_script(args.seed,
+                              data["adp"].to("angstrom").magnitude,
+                              data["atoms"],
+                              data["r_eq"].to("angstrom").magnitude,
+                              settings.settings["jmol_scale"],
+                              environments)
             with open(f"{args.seed}_env.out","w") as file:
               for i in range(len(environments)):
                 file.write(f"environment {i}: ")

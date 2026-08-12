@@ -1,7 +1,6 @@
 import re
 import numpy as np
-from . import adp_obj
-from . import adp_constants
+from .adp_obj import Cell, MD
 
 def parse_md(seed,equ_timesteps):
     # load md file
@@ -46,7 +45,7 @@ def parse_md(seed,equ_timesteps):
             velocities[i,j-start,:] = np.asarray(md_file[j].split()[2:5],dtype=float)
 
     # create MD object
-    md = adp_obj.MD(len(idxs),atoms,positions,velocities)
+    md = MD(len(idxs),atoms,positions,velocities)
 
     return md
 
@@ -76,6 +75,6 @@ def parse_cell(seed):
             elif "lattice" in line.lower():
                 l_block = False
 
-    cell = adp_obj.Cell(lattice_block,positions_block)
+    cell = Cell(lattice_block,positions_block)
 
     return cell

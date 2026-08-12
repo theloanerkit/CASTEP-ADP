@@ -1,6 +1,6 @@
 import numpy as np
-from . import adp_err
-from . import adp_constants
+import castep_adp.err
+from castep_adp.constants import ureg
 
 class MD:
     def __init__(self,timesteps,atoms,positions,velocities):
@@ -19,8 +19,8 @@ class MD:
         return string
 
     def apply_units(self):
-        self.positions *= adp_constants.ureg.atomic_unit_of_length
-        self.velocities *= (adp_constants.ureg.atomic_unit_of_length/adp_constants.ureg.atomic_unit_of_time)
+        self.positions *= ureg.atomic_unit_of_length
+        self.velocities *= (ureg.atomic_unit_of_length/ureg.atomic_unit_of_time)
 
 class Cell:
     def __init__(self,lattice,positions):
@@ -36,7 +36,7 @@ class Cell:
     def get_positions_abs(self):
         positions = {}
         for key in self.positions_frac.keys():
-            pos = np.zeros(3,dtype=float)*adp_constants.ureg.angstrom
+            pos = np.zeros(3,dtype=float)*ureg.angstrom
             for i in range(3):
                 pos += self.positions_frac[key][i] * self.lattice_cart[i]
             positions[key] = pos
@@ -46,7 +46,7 @@ class Cell:
         if "cart" in self.lattice[0].lower():
             self.construct_cart()
         elif "abc" in self.lattice[0].lower():
-            adp_err.no_lattice_cart()
+            castep_adp.err.no_lattice_cart()
         if "abs" in self.positions[0].lower():
             self.construct_abs()
         elif "frac" in self.positions[0].lower():
@@ -57,9 +57,9 @@ class Cell:
         if len(self.lattice) == 6:
             # units included, but assuming angstrom for now
             start += 1
-        lattice = np.zeros((3,3),dtype=float)*adp_constants.ureg.angstrom
+        lattice = np.zeros((3,3),dtype=float)*ureg.angstrom
         for i in range(start,start+3):
-            lattice[i-start] = np.asarray(self.lattice[i].split(),dtype=float)*adp_constants.ureg.angstrom
+            lattice[i-start] = np.asarray(self.lattice[i].split(),dtype=float)*ureg.angstrom
         self.lattice_cart = lattice
 
     def construct_abs(self):
@@ -74,7 +74,7 @@ class Cell:
                 elements[line[0]] = 0
             elements[line[0]] += 1
             name = f"{line[0]} {elements[line[0]]}"
-            pos = np.asarray(line[1:4],dtype=float)*adp_constants.ureg.angstrom
+            pos = np.asarray(line[1:4],dtype=float)*ureg.angstrom
             positions[name] = pos
         self.positions_abs = positions
 
