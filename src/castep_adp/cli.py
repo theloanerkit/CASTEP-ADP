@@ -6,7 +6,7 @@ from . import adp_constants
 from .adp_settings import Settings
 from . import err
 from . import adp_io
-from .adp_parse import parse_md, parse_cell
+from .parse import parse_md, parse_cell
 from . import obj
 
 def calc_r_eq_from_md(md):

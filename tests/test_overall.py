@@ -1,4 +1,4 @@
-from castep_adp import cli, obj, adp_parse, adp_settings, adp_io
+from castep_adp import cli, obj, parse, adp_settings, adp_io
 
 def test_module_imports():
   import castep_adp
@@ -6,7 +6,7 @@ def test_module_imports():
 def test_run():
   seed = "tests/data/test_N2_2"
   user_settings = adp_settings.Settings(seed)
-  md = adp_parse.parse_md(seed,user_settings.settings["equilibration_timesteps"])
+  md = parse.parse_md(seed,user_settings.settings["equilibration_timesteps"])
   atoms = {}
   for label in md.atoms:
     atoms[label] = obj.Atom(label)
