@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import adp_err, adp_settings, adp_constants
+from castep_adp import err, adp_settings, adp_constants
 
 def check_dict(s,dict):
   errors = 0
@@ -187,11 +187,11 @@ def test_eq_timesteps():
   s1 = adp_settings.Settings("tests/data/test_eq_ts_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s2 = adp_settings.Settings("tests/data/test_eq_ts_2")
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s3 = adp_settings.Settings("tests/data/test_eq_ts_3")
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s4 = adp_settings.Settings("tests/data/test_eq_ts_4")
 
 def test_write_jmol():
@@ -215,7 +215,7 @@ def test_write_jmol():
   s1 = adp_settings.Settings("tests/data/test_write_jmol_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s2 = adp_settings.Settings("tests/data/test_write_jmol_2")
   params_dict["jmol_scale"] = 10
   s3 = adp_settings.Settings("tests/data/test_write_jmol_3")
@@ -226,9 +226,9 @@ def test_write_jmol():
   params_dict["jmol_scale"] = 0.1
   s5 = adp_settings.Settings("tests/data/test_write_jmol_5")
   errors, errmsg = check_dict(s5.settings,params_dict)
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s6 = adp_settings.Settings("tests/data/test_write_jmol_6")
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s7 = adp_settings.Settings("tests/data/test_write_jmol_7")
 
 def test_r_equ():
@@ -252,7 +252,7 @@ def test_r_equ():
   s1 = adp_settings.Settings("tests/data/test_r_equ_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
-  with pytest.raises(adp_err.InvalidParamter):
+  with pytest.raises(err.InvalidParamter):
     s2 = adp_settings.Settings("tests/data/test_r_equ_2")
 
 def test_detect_env():

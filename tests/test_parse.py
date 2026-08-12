@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import adp_constants, adp_err,adp_parse
+from castep_adp import adp_constants, err,adp_parse
 import numpy as np
 
 def check_md_obj(obj,timesteps,atoms):
@@ -52,7 +52,7 @@ def test_N2_md():
   assert errors==0,errmsg
 
 def test_N2_md_too_much_equ():
-  with pytest.raises(adp_err.ParseMDError):
+  with pytest.raises(err.ParseMDError):
     n2 = adp_parse.parse_md("tests/data/test_N2",4)
 
 
@@ -79,15 +79,15 @@ def test_BTO_cart_abs():
   assert errors==0,errmsg
 
 def test_BTO_abc():
-  with pytest.raises(adp_err.IncompatibleCell):
+  with pytest.raises(err.IncompatibleCell):
     bto = adp_parse.parse_cell("tests/data/test_BaTiO_abc")
 
 def test_BTO_no_lattice():
-  with pytest.raises(adp_err.IncompatibleCell):
+  with pytest.raises(err.IncompatibleCell):
     bto = adp_parse.parse_cell("tests/data/test_BaTiO_frac")
 
 def test_BTO_no_positions():
-  with pytest.raises(adp_err.IncompatibleCell):
+  with pytest.raises(err.IncompatibleCell):
     bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart")
 
 def test_BTO_cart_units_ang():
@@ -135,9 +135,9 @@ def test_BTO_abs_units_nm():
   assert errors==0,errmsg
 
 def test_BTO_cart_units_unknown():
-  with pytest.raises(adp_err.UnitError):
+  with pytest.raises(err.UnitError):
     bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_furlong")
 
 def test_BTO_cart_units_electronvolt():
-  with pytest.raises(adp_err.UnitError):
+  with pytest.raises(err.UnitError):
     bto = adp_parse.parse_cell("tests/data/test_BaTiO_cart_electronvolt")

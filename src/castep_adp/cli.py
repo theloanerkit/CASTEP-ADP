@@ -4,7 +4,7 @@ import os
 # -----------------
 from . import adp_constants
 from .adp_settings import Settings
-from . import adp_err
+from . import err
 from . import adp_io
 from .adp_parse import parse_md, parse_cell
 from . import adp_obj
@@ -146,7 +146,7 @@ def main() -> None:
 
     if not args.dryrun:
         if not os.path.isfile(f"{args.seed}.md"):
-            adp_err.file_not_found(args.seed,".md")
+            err.file_not_found(args.seed,".md")
 
         print("parsing md file")
         md_obj = parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
@@ -161,7 +161,7 @@ def main() -> None:
         if user_settings.settings["r_equilibrium"] == "zero":
             print("reading r_eq from cell")
             if not os.path.isfile(f"{args.seed}.cell"):
-                adp_err.file_not_found(args.seed,".cell")
+                err.file_not_found(args.seed,".cell")
             cell_obj = parse_cell(args.seed)
             for key in cell_obj.positions_abs.keys():
                 atoms[key].r_eq = cell_obj.positions_abs[key]
