@@ -1,6 +1,6 @@
 import re
 import numpy as np
-from . import adp_obj as obj
+from . import obj
 from . import err
 
 def parse_md(seed,equ_timesteps=0):

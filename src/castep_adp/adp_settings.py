@@ -1,6 +1,6 @@
 from . import err
 from . import adp_constants
-from .adp_obj import Tolerance
+from .obj import Tolerance
 
 def check_int(obj,key,ubound=None,lbound=None):
   # check if parameter is an integer

@@ -7,7 +7,7 @@ from .adp_settings import Settings
 from . import err
 from . import adp_io
 from .adp_parse import parse_md, parse_cell
-from . import adp_obj
+from . import obj
 
 def calc_r_eq_from_md(md):
   # initialise array
@@ -152,7 +152,7 @@ def main() -> None:
         md_obj = parse_md(args.seed,user_settings.settings["equilibration_timesteps"])
         data["atoms"] = md_obj.atoms
         for label in md_obj.atoms:
-            atoms[label] = adp_obj.Atom(label)
+            atoms[label] = obj.Atom(label)
         keys = list(atoms.keys())
 
         if user_settings.settings["detect_environment"] is not None:
