@@ -1,4 +1,4 @@
-from castep_adp import adp_cli, adp_obj, adp_parse, adp_settings, adp_io
+from castep_adp import cli, adp_obj, adp_parse, adp_settings, adp_io
 
 def test_module_imports():
   import castep_adp
@@ -12,8 +12,8 @@ def test_run():
     atoms[label] = adp_obj.Atom(label)
   keys = list(atoms.keys())
 
-  r_eq = adp_cli.calc_r_eq_from_md(md)
-  ke = adp_cli.calc_ke_tensor(md)
+  r_eq = cli.calc_r_eq_from_md(md)
+  ke = cli.calc_ke_tensor(md)
 
   for i in range(len(keys)):
     atoms[keys[i]].r_eq = r_eq[i]
