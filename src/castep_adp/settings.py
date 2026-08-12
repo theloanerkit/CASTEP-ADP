@@ -80,7 +80,7 @@ def check_string_arr(obj,key,keywords=None):
         for val in obj.settings[key]:
             if val not in keywords:
                 obj.valid = False
-                # adp_err
+                # err
     else:
         obj.valid = False
 

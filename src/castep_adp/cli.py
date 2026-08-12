@@ -3,7 +3,7 @@ import numpy as np
 import os
 # -----------------
 from . import adp_constants
-from .adp_settings import Settings
+from .settings import Settings
 from . import err
 from . import adp_io
 from .parse import parse_md, parse_cell

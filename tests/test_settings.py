@@ -1,5 +1,5 @@
 import pytest
-from castep_adp import err, adp_settings, adp_constants
+from castep_adp import err, settings, adp_constants
 
 def check_dict(s,dict):
   errors = 0
@@ -30,11 +30,11 @@ def test_default_settings():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s = adp_settings.Settings("tests/data/test_default")
+  s = settings.Settings("tests/data/test_default")
   errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
-def test_adp_settings_1():
+def test_settings_1():
   params_dict = {
     "equilibration_timesteps"  : 0,
     "calculate_adp"            : True,
@@ -50,11 +50,11 @@ def test_adp_settings_1():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s = adp_settings.Settings("tests/data/test_adp_1")
+  s = settings.Settings("tests/data/test_adp_1")
   errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
-def test_adp_settings_2():
+def test_settings_2():
   params_dict = {
     "equilibration_timesteps"  : 0,
     "calculate_adp"            : True,
@@ -70,7 +70,7 @@ def test_adp_settings_2():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s = adp_settings.Settings("tests/data/test_adp_2")
+  s = settings.Settings("tests/data/test_adp_2")
   errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
@@ -90,79 +90,79 @@ def test_ke_settings_1():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s = adp_settings.Settings("tests/data/test_ke_1")
+  s = settings.Settings("tests/data/test_ke_1")
   errors, errmsg = check_dict(s.settings,params_dict)
   assert errors==0, errmsg
 
 def test_length_unit_angstrom():
   output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
                   "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
-  s1 = adp_settings.Settings("tests/data/test_angstrom_1")
+  s1 = settings.Settings("tests/data/test_angstrom_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_angstrom_2")
+  s2 = settings.Settings("tests/data/test_angstrom_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
 
 def test_length_unit_bohr():
   output_units = {"length":[adp_constants.ureg.bohr,"bohr"],
                   "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
-  s1 = adp_settings.Settings("tests/data/test_bohr_1")
+  s1 = settings.Settings("tests/data/test_bohr_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_bohr_2")
+  s2 = settings.Settings("tests/data/test_bohr_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
-  s3 = adp_settings.Settings("tests/data/test_bohr_3")
+  s3 = settings.Settings("tests/data/test_bohr_3")
   errors, errmsg = check_dict(s3.output_units,output_units)
   assert errors==0, errmsg
 
 def test_length_unit_nanometer():
   output_units = {"length":[adp_constants.ureg.nanometer,"nm"],
                   "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
-  s1 = adp_settings.Settings("tests/data/test_nanometer_1")
+  s1 = settings.Settings("tests/data/test_nanometer_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_nanometer_2")
+  s2 = settings.Settings("tests/data/test_nanometer_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
 
 def test_energy_unit_electron_volt():
   output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
                   "energy":[adp_constants.ureg.electron_volt,"electron-volt"]}
-  s1 = adp_settings.Settings("tests/data/test_electron_volt_1")
+  s1 = settings.Settings("tests/data/test_electron_volt_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_electron_volt_2")
+  s2 = settings.Settings("tests/data/test_electron_volt_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
-  s3 = adp_settings.Settings("tests/data/test_electron_volt_3")
+  s3 = settings.Settings("tests/data/test_electron_volt_3")
   errors, errmsg = check_dict(s3.output_units,output_units)
   assert errors==0, errmsg
 
 def test_energy_unit_hartree():
   output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
                   "energy":[adp_constants.ureg.hartree,"hartree"]}
-  s1 = adp_settings.Settings("tests/data/test_hartree_1")
+  s1 = settings.Settings("tests/data/test_hartree_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_hartree_2")
+  s2 = settings.Settings("tests/data/test_hartree_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
-  s3 = adp_settings.Settings("tests/data/test_hartree_3")
+  s3 = settings.Settings("tests/data/test_hartree_3")
   errors, errmsg = check_dict(s3.output_units,output_units)
   assert errors==0, errmsg
-  s4 = adp_settings.Settings("tests/data/test_hartree_4")
+  s4 = settings.Settings("tests/data/test_hartree_4")
   errors, errmsg = check_dict(s4.output_units,output_units)
   assert errors==0, errmsg
 
 def test_energy_unit_hartree():
   output_units = {"length":[adp_constants.ureg.angstrom,"angstrom"],
                   "energy":[adp_constants.ureg.joule,"joule"]}
-  s1 = adp_settings.Settings("tests/data/test_joule_1")
+  s1 = settings.Settings("tests/data/test_joule_1")
   errors, errmsg = check_dict(s1.output_units,output_units)
   assert errors==0, errmsg
-  s2 = adp_settings.Settings("tests/data/test_joule_2")
+  s2 = settings.Settings("tests/data/test_joule_2")
   errors, errmsg = check_dict(s2.output_units,output_units)
   assert errors==0, errmsg
 
@@ -184,15 +184,15 @@ def test_eq_timesteps():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s1 = adp_settings.Settings("tests/data/test_eq_ts_1")
+  s1 = settings.Settings("tests/data/test_eq_ts_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = adp_settings.Settings("tests/data/test_eq_ts_2")
+    s2 = settings.Settings("tests/data/test_eq_ts_2")
   with pytest.raises(err.InvalidParamter):
-    s3 = adp_settings.Settings("tests/data/test_eq_ts_3")
+    s3 = settings.Settings("tests/data/test_eq_ts_3")
   with pytest.raises(err.InvalidParamter):
-    s4 = adp_settings.Settings("tests/data/test_eq_ts_4")
+    s4 = settings.Settings("tests/data/test_eq_ts_4")
 
 def test_write_jmol():
   params_dict = {
@@ -212,24 +212,24 @@ def test_write_jmol():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s1 = adp_settings.Settings("tests/data/test_write_jmol_1")
+  s1 = settings.Settings("tests/data/test_write_jmol_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = adp_settings.Settings("tests/data/test_write_jmol_2")
+    s2 = settings.Settings("tests/data/test_write_jmol_2")
   params_dict["jmol_scale"] = 10
-  s3 = adp_settings.Settings("tests/data/test_write_jmol_3")
+  s3 = settings.Settings("tests/data/test_write_jmol_3")
   errors, errmsg = check_dict(s3.settings,params_dict)
   params_dict["jmol_scale"] = 6.9
-  s4 = adp_settings.Settings("tests/data/test_write_jmol_4")
+  s4 = settings.Settings("tests/data/test_write_jmol_4")
   errors, errmsg = check_dict(s4.settings,params_dict)
   params_dict["jmol_scale"] = 0.1
-  s5 = adp_settings.Settings("tests/data/test_write_jmol_5")
+  s5 = settings.Settings("tests/data/test_write_jmol_5")
   errors, errmsg = check_dict(s5.settings,params_dict)
   with pytest.raises(err.InvalidParamter):
-    s6 = adp_settings.Settings("tests/data/test_write_jmol_6")
+    s6 = settings.Settings("tests/data/test_write_jmol_6")
   with pytest.raises(err.InvalidParamter):
-    s7 = adp_settings.Settings("tests/data/test_write_jmol_7")
+    s7 = settings.Settings("tests/data/test_write_jmol_7")
 
 def test_r_equ():
   params_dict = {
@@ -249,11 +249,11 @@ def test_r_equ():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s1 = adp_settings.Settings("tests/data/test_r_equ_1")
+  s1 = settings.Settings("tests/data/test_r_equ_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   with pytest.raises(err.InvalidParamter):
-    s2 = adp_settings.Settings("tests/data/test_r_equ_2")
+    s2 = settings.Settings("tests/data/test_r_equ_2")
 
 def test_detect_env():
   params_dict = {
@@ -273,10 +273,10 @@ def test_detect_env():
     "environment_tolerance_adp": None,
     "environment_tolerance_ke" : None
   }
-  s1 = adp_settings.Settings("tests/data/test_detect_env_1")
+  s1 = settings.Settings("tests/data/test_detect_env_1")
   errors, errmsg = check_dict(s1.settings,params_dict)
   assert errors==0, errmsg
   params_dict["detect_environment"].append("o")
-  s2 = adp_settings.Settings("tests/data/test_detect_env_2")
+  s2 = settings.Settings("tests/data/test_detect_env_2")
   errors, errmsg = check_dict(s2.settings,params_dict)
   assert errors==0, errmsg
