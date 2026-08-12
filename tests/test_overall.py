@@ -1,4 +1,4 @@
-from castep_adp import cli, obj, parse, settings, adp_io
+from castep_adp import cli, obj, parse, settings, io
 
 def test_module_imports():
   import castep_adp
@@ -19,4 +19,4 @@ def test_run():
     atoms[keys[i]].r_eq = r_eq[i]
     atoms[keys[i]].ke = ke[i]
 
-  adp_io.write_out(seed,user_settings,atoms,False)
+  io.write_out(seed,user_settings,atoms,False)

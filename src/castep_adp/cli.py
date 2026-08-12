@@ -5,7 +5,7 @@ import os
 from . import constants
 from .settings import Settings
 from . import err
-from . import adp_io
+from . import io
 from .parse import parse_md, parse_cell
 from . import obj
 
@@ -211,11 +211,11 @@ def main() -> None:
         
 
     print("writing")
-    adp_io.write_out(args.seed,user_settings,atoms,args.dryrun)
+    io.write_out(args.seed,user_settings,atoms,args.dryrun)
     if not args.dryrun:
         if user_settings.settings["write_jmol"]:
             print("writing jmol")
-            adp_io.write_jmol_script(args.seed,
+            io.write_jmol_script(args.seed,
                                      data["adp"].to("angstrom").magnitude,
                                      data["atoms"],
                                      data["r_eq"].to("angstrom").magnitude,
@@ -223,7 +223,7 @@ def main() -> None:
         if user_settings.settings["detect_environment"] is not None:
             print("writing environments jmol")
             print(f"{len(environments)} environments found")
-            adp_io.write_jmol_script(args.seed,
+            io.write_jmol_script(args.seed,
                                      data["adp"].to("angstrom").magnitude,
                                      data["atoms"],
                                      data["r_eq"].to("angstrom").magnitude,
