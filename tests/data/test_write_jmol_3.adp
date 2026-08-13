@@ -1,0 +1,1 @@
+jmol_scale : 10

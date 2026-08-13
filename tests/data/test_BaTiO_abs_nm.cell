@@ -1,0 +1,15 @@
+%block lattice_cart
+40.2  0.00  0.00
+0.00  40.2  0.00
+0.00  0.00  40.2   
+%endblock lattice_cart
+
+%block positions_abs
+nm
+O   2.01  2.01  0.00
+O   2.01  0.00  2.01
+O   0.00  2.01  2.01
+Ti  2.01  2.01  2.01
+Ba  0.00  0.00  0.00
+%endblock positions_abs
+

@@ -2,6 +2,7 @@
 *.bib
 *.castep
 *.cell
+!tests/data/*.cell
 *.md
 *.param
 *.zip
@@ -12,7 +13,10 @@ plot.py
 *.adp
 **/__pycache__
 !example.adp
+!tests/data/*.adp
 *.dat
 *.out
 castep-adp-old.py
 *.f90
+*.sh
+!tests/data/*.md
